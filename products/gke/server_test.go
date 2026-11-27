@@ -164,12 +164,13 @@ func TestOperations(t *testing.T) {
 		t.Fatalf("ListOperations all zones: %v %+v", err, l3)
 	}
 
-	// Node pool / server config RPCs stay honestly UNIMPLEMENTED.
-	if _, err := s.GetNodePool(ctx, &containerpb.GetNodePoolRequest{}); status.Code(err) != codes.Unimplemented {
-		t.Fatalf("GetNodePool: got %v, want Unimplemented", err)
+	// Node pool lookups validate references; server config reports deterministic reference data.
+	if _, err := s.GetNodePool(ctx, &containerpb.GetNodePoolRequest{}); status.Code(err) != codes.NotFound {
+		t.Fatalf("GetNodePool empty reference: got %v, want NotFound", err)
 	}
-	if _, err := s.GetServerConfig(ctx, &containerpb.GetServerConfigRequest{}); status.Code(err) != codes.Unimplemented {
-		t.Fatalf("GetServerConfig: got %v, want Unimplemented", err)
+	cfg, err := s.GetServerConfig(ctx, &containerpb.GetServerConfigRequest{})
+	if err != nil || cfg.GetDefaultClusterVersion() == "" {
+		t.Fatalf("GetServerConfig: %v %+v", err, cfg)
 	}
 }
 
@@ -315,14 +316,47 @@ func TestRESTGateway(t *testing.T) {
 		t.Fatalf("delete status = %d body=%s", resp5.StatusCode, raw)
 	}
 
-	// Scaffolded method on the same service stays UNIMPLEMENTED.
+	// Node pools are implemented; the deleted cluster is reported as absent.
 	resp6, err := http.Get(ts.URL + "/v1/projects/" + project + "/locations/us-central1-a/clusters/rest-c/nodePools")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer resp6.Body.Close()
-	if resp6.StatusCode != 501 {
+	if resp6.StatusCode != 404 {
 		raw, _ := io.ReadAll(resp6.Body)
-		t.Fatalf("nodePools status = %d body=%s, want 501", resp6.StatusCode, raw)
+		t.Fatalf("nodePools status = %d body=%s, want 404", resp6.StatusCode, raw)
+	}
+}
+
+func TestNodePoolCRUD(t *testing.T) {
+	s := &server{state: NewState()}
+	ctx := context.Background()
+	createCluster(t, s, "us-central1-a", "np-cluster")
+	if _, err := s.CreateNodePool(ctx, &containerpb.CreateNodePoolRequest{
+		ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster",
+		NodePool: &containerpb.NodePool{Name: "pool-1", InitialNodeCount: 2},
+	}); err != nil {
+		t.Fatalf("CreateNodePool: %v", err)
+	}
+	got, err := s.GetNodePool(ctx, &containerpb.GetNodePoolRequest{ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster", NodePoolId: "pool-1"})
+	if err != nil || got.GetStatus() != containerpb.NodePool_RUNNING || got.GetInitialNodeCount() != 2 {
+		t.Fatalf("GetNodePool: %v %+v", err, got)
+	}
+	if _, err := s.SetNodePoolSize(ctx, &containerpb.SetNodePoolSizeRequest{ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster", NodePoolId: "pool-1", NodeCount: 4}); err != nil {
+		t.Fatalf("SetNodePoolSize: %v", err)
+	}
+	got, _ = s.GetNodePool(ctx, &containerpb.GetNodePoolRequest{ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster", NodePoolId: "pool-1"})
+	if got.GetInitialNodeCount() != 4 {
+		t.Fatalf("size not updated: %+v", got)
+	}
+	list, err := s.ListNodePools(ctx, &containerpb.ListNodePoolsRequest{ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster"})
+	if err != nil || len(list.GetNodePools()) != 1 {
+		t.Fatalf("ListNodePools: %v %+v", err, list)
+	}
+	if _, err := s.DeleteNodePool(ctx, &containerpb.DeleteNodePoolRequest{ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster", NodePoolId: "pool-1"}); err != nil {
+		t.Fatalf("DeleteNodePool: %v", err)
+	}
+	if _, err := s.GetNodePool(ctx, &containerpb.GetNodePoolRequest{ProjectId: project, Zone: "us-central1-a", ClusterId: "np-cluster", NodePoolId: "pool-1"}); status.Code(err) != codes.NotFound {
+		t.Fatalf("deleted node pool: %v", err)
 	}
 }

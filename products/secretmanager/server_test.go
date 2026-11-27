@@ -18,9 +18,9 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	iampb "github.com/bestony/google-cloud-emulator/gen/google/iam/v1"
-	smpb "github.com/bestony/google-cloud-emulator/gen/google/cloud/secretmanager/v1"
 	"github.com/bestony/google-cloud-emulator/core/iam"
+	smpb "github.com/bestony/google-cloud-emulator/gen/google/cloud/secretmanager/v1"
+	iampb "github.com/bestony/google-cloud-emulator/gen/google/iam/v1"
 )
 
 func newTestServer(t *testing.T) (*Server, *State) {

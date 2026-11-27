@@ -3,6 +3,7 @@ package gcs
 import (
 	"encoding/json"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -14,7 +15,14 @@ func newHandler() *Handler {
 }
 
 func do(h *Handler, method, path, body string) *httptest.ResponseRecorder {
+	return doTyped(h, method, path, body, "")
+}
+
+func doTyped(h *Handler, method, path, body, contentType string) *httptest.ResponseRecorder {
 	req := httptest.NewRequest(method, path, strings.NewReader(body))
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
+	}
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, req)
 	return rec
@@ -163,17 +171,194 @@ func TestBucketIAM(t *testing.T) {
 	}
 }
 
-func TestObjectsUnimplemented(t *testing.T) {
+func TestObjectDataPlane(t *testing.T) {
 	h := newHandler()
 	do(h, "POST", "/storage/v1/b?project=demo", `{"name":"obj-bucket"}`)
-	for _, path := range []string{
-		"/storage/v1/b/obj-bucket/o",
-		"/storage/v1/b/obj-bucket/o/some/object.txt",
-		"/storage/v1/upload/storage/v1/b/obj-bucket/o",
-	} {
-		rec := do(h, "POST", path, `{}`)
-		if rec.Code != 501 && rec.Code != 404 {
-			t.Fatalf("%s: got %d, want 501", path, rec.Code)
-		}
+
+	// Simple media upload creates object metadata with hashes and server fields.
+	rec := doTyped(h, "POST", "/upload/storage/v1/b/obj-bucket/o?uploadType=media&name=dir/hello.txt", "hello world", "text/plain")
+	if rec.Code != 200 {
+		t.Fatalf("media upload: %d %s", rec.Code, rec.Body)
+	}
+	var obj map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &obj)
+	if obj["kind"] != "storage#object" || obj["bucket"] != "obj-bucket" || obj["name"] != "dir/hello.txt" {
+		t.Fatalf("bad object metadata: %v", obj)
+	}
+	if obj["size"] != "11" || obj["md5Hash"] == "" || obj["crc32c"] == "" || obj["generation"] == "" {
+		t.Fatalf("missing object data fields: %v", obj)
+	}
+	if obj["contentType"] != "text/plain" {
+		t.Fatalf("content type not preserved: %v", obj["contentType"])
+	}
+	generation := obj["generation"].(string)
+
+	// Metadata is addressable using the URL-escaped object name.
+	rec = do(h, "GET", "/storage/v1/b/obj-bucket/o/dir%2Fhello.txt", "")
+	if rec.Code != 200 {
+		t.Fatalf("get object metadata: %d %s", rec.Code, rec.Body)
+	}
+
+	// alt=media downloads the bytes and content type.
+	rec = do(h, "GET", "/storage/v1/b/obj-bucket/o/dir%2Fhello.txt?alt=media", "")
+	if rec.Code != 200 || rec.Body.String() != "hello world" {
+		t.Fatalf("download: %d %q", rec.Code, rec.Body.String())
+	}
+	if ct := rec.Header().Get("Content-Type"); ct != "text/plain" {
+		t.Fatalf("download content type: %q", ct)
+	}
+
+	// Generation-specific reads work.
+	rec = do(h, "GET", "/storage/v1/b/obj-bucket/o/dir%2Fhello.txt?alt=media&generation="+generation, "")
+	if rec.Code != 200 || rec.Body.String() != "hello world" {
+		t.Fatalf("generation download: %d %q", rec.Code, rec.Body.String())
+	}
+
+	// PATCH merges custom metadata and bumps metageneration.
+	rec = do(h, "PATCH", "/storage/v1/b/obj-bucket/o/dir%2Fhello.txt", `{"metadata":{"tier":"hot"},"cacheControl":"no-cache"}`)
+	if rec.Code != 200 {
+		t.Fatalf("patch object: %d %s", rec.Code, rec.Body)
+	}
+	json.Unmarshal(rec.Body.Bytes(), &obj)
+	if obj["metageneration"] != "2" || obj["cacheControl"] != "no-cache" {
+		t.Fatalf("patch did not update metadata: %v", obj)
+	}
+	custom := obj["metadata"].(map[string]any)
+	if custom["tier"] != "hot" {
+		t.Fatalf("custom metadata lost: %v", custom)
+	}
+
+	// Objects can be listed by prefix.
+	rec = do(h, "GET", "/storage/v1/b/obj-bucket/o?prefix=dir/", "")
+	if rec.Code != 200 {
+		t.Fatalf("list objects: %d", rec.Code)
+	}
+	var list map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &list)
+	if items, _ := list["items"].([]any); len(items) != 1 {
+		t.Fatalf("list objects: %v", list)
+	}
+
+	// Delete removes the live object.
+	rec = do(h, "DELETE", "/storage/v1/b/obj-bucket/o/dir%2Fhello.txt", "")
+	if rec.Code != 200 {
+		t.Fatalf("delete object: %d %s", rec.Code, rec.Body)
+	}
+	rec = do(h, "GET", "/storage/v1/b/obj-bucket/o/dir%2Fhello.txt", "")
+	if rec.Code != 404 {
+		t.Fatalf("get after delete: got %d, want 404", rec.Code)
+	}
+}
+
+func TestObjectUploadsCopyComposeAndListDelimiter(t *testing.T) {
+	h := newHandler()
+	do(h, "POST", "/storage/v1/b?project=demo", `{"name":"data-bucket"}`)
+
+	// Multipart upload carries JSON metadata plus object bytes in one request.
+	boundary := "gcptest"
+	body := "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+		`{"name":"dir/a.txt","metadata":{"part":"one"}}` + "\r\n" +
+		"--" + boundary + "\r\nContent-Type: text/plain\r\n\r\nA\r\n" +
+		"--" + boundary + "--\r\n"
+	rec := doTyped(h, "POST", "/upload/storage/v1/b/data-bucket/o?uploadType=multipart", body, "multipart/related; boundary="+boundary)
+	if rec.Code != 200 {
+		t.Fatalf("multipart upload: %d %s", rec.Code, rec.Body)
+	}
+	var obj map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &obj)
+	if obj["name"] != "dir/a.txt" || obj["size"] != "1" {
+		t.Fatalf("multipart metadata: %v", obj)
+	}
+
+	// A second object exercises delimiter listing and compose.
+	doTyped(h, "POST", "/upload/storage/v1/b/data-bucket/o?uploadType=media&name=dir/sub/b.txt", "B", "text/plain")
+	doTyped(h, "POST", "/upload/storage/v1/b/data-bucket/o?uploadType=media&name=root.txt", "R", "text/plain")
+	rec = do(h, "GET", "/storage/v1/b/data-bucket/o?prefix=dir/&delimiter=/", "")
+	if rec.Code != 200 {
+		t.Fatalf("delimiter list: %d", rec.Code)
+	}
+	var list map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &list)
+	if items, _ := list["items"].([]any); len(items) != 1 {
+		t.Fatalf("delimiter list items: %v", list)
+	}
+	if prefixes, _ := list["prefixes"].([]any); len(prefixes) != 1 || prefixes[0] != "dir/sub/" {
+		t.Fatalf("delimiter list prefixes: %v", list)
+	}
+
+	// copyTo duplicates bytes and metadata under a new name.
+	rec = do(h, "POST", "/storage/v1/b/data-bucket/o/dir%2Fa.txt/copyTo/b/data-bucket/o/copied.txt", `{}`)
+	if rec.Code != 200 {
+		t.Fatalf("copyTo: %d %s", rec.Code, rec.Body)
+	}
+	rec = do(h, "GET", "/storage/v1/b/data-bucket/o/copied.txt?alt=media", "")
+	if rec.Code != 200 || rec.Body.String() != "A" {
+		t.Fatalf("copied download: %d %q", rec.Code, rec.Body.String())
+	}
+
+	// compose concatenates source object bytes in request order.
+	rec = do(h, "POST", "/storage/v1/b/data-bucket/o/joined.txt/compose", `{"sourceObjects":[{"name":"dir/a.txt"},{"name":"dir/sub/b.txt"}]}`)
+	if rec.Code != 200 {
+		t.Fatalf("compose: %d %s", rec.Code, rec.Body)
+	}
+	rec = do(h, "GET", "/storage/v1/b/data-bucket/o/joined.txt?alt=media", "")
+	if rec.Code != 200 || rec.Body.String() != "AB" {
+		t.Fatalf("composed download: %d %q", rec.Code, rec.Body.String())
+	}
+}
+
+func TestObjectResumableUploadAndVersioning(t *testing.T) {
+	h := newHandler()
+	do(h, "POST", "/storage/v1/b?project=demo", `{"name":"versioned-bucket","versioning":{"enabled":true}}`)
+
+	// Initiate a resumable upload session.
+	rec := doTyped(h, "POST", "/upload/storage/v1/b/versioned-bucket/o?uploadType=resumable", `{"name":"chunked.bin","contentType":"application/octet-stream"}`, "application/json")
+	if rec.Code != 200 {
+		t.Fatalf("start resumable: %d %s", rec.Code, rec.Body)
+	}
+	loc := rec.Header().Get("Location")
+	if loc == "" {
+		t.Fatalf("missing resumable session Location")
+	}
+	u, err := url.Parse(loc)
+	if err != nil {
+		t.Fatalf("parse location: %v", err)
+	}
+
+	// A single PUT completes the session.
+	rec = doTyped(h, "PUT", u.Path+"?"+u.RawQuery, "chunked-content", "application/octet-stream")
+	if rec.Code != 200 {
+		t.Fatalf("complete resumable: %d %s", rec.Code, rec.Body)
+	}
+	var first map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &first)
+	firstGen := first["generation"].(string)
+
+	// Overwriting keeps the old generation because bucket versioning is enabled.
+	rec = doTyped(h, "POST", "/upload/storage/v1/b/versioned-bucket/o?uploadType=media&name=chunked.bin", "new-content", "application/octet-stream")
+	if rec.Code != 200 {
+		t.Fatalf("overwrite: %d %s", rec.Code, rec.Body)
+	}
+	var second map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &second)
+	if second["generation"] == firstGen {
+		t.Fatalf("overwrite did not allocate a new generation")
+	}
+	rec = do(h, "GET", "/storage/v1/b/versioned-bucket/o/chunked.bin?versions=true", "")
+	// Metadata GET ignores versions=true; list is the versioned view.
+	if rec.Code != 200 {
+		t.Fatalf("metadata after overwrite: %d", rec.Code)
+	}
+	rec = do(h, "GET", "/storage/v1/b/versioned-bucket/o?versions=true&prefix=chunked.bin", "")
+	var list map[string]any
+	json.Unmarshal(rec.Body.Bytes(), &list)
+	if items, _ := list["items"].([]any); len(items) != 2 {
+		t.Fatalf("versioned list should contain live and archived generation: %v", list)
+	}
+
+	// The archived generation remains readable by generation.
+	rec = do(h, "GET", "/storage/v1/b/versioned-bucket/o/chunked.bin?alt=media&generation="+firstGen, "")
+	if rec.Code != 200 || rec.Body.String() != "chunked-content" {
+		t.Fatalf("archived generation download: %d %q", rec.Code, rec.Body.String())
 	}
 }

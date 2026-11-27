@@ -2,17 +2,18 @@ package secretmanager
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"strings"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	iampb "github.com/bestony/google-cloud-emulator/gen/google/iam/v1"
-	smpb "github.com/bestony/google-cloud-emulator/gen/google/cloud/secretmanager/v1"
 	"github.com/bestony/google-cloud-emulator/core/auth"
 	gcperr "github.com/bestony/google-cloud-emulator/core/errors"
 	"github.com/bestony/google-cloud-emulator/core/iam"
 	"github.com/bestony/google-cloud-emulator/core/pagination"
+	smpb "github.com/bestony/google-cloud-emulator/gen/google/cloud/secretmanager/v1"
+	iampb "github.com/bestony/google-cloud-emulator/gen/google/iam/v1"
 )
 
 // Server implements SecretManagerServiceServer.
@@ -215,8 +216,8 @@ func (s *Server) AccessSecretVersion(ctx context.Context, req *smpb.AccessSecret
 	return &smpb.AccessSecretVersionResponse{
 		Name: fmt.Sprintf("%s/versions/%d", secretName, ver.Number),
 		Payload: &smpb.SecretPayload{
-			Data:         ver.Data,
-			DataCrc32C:   &crc,
+			Data:       ver.Data,
+			DataCrc32C: &crc,
 		},
 	}, nil
 }
@@ -341,4 +342,31 @@ func toIAMBindings(in []iam.Binding) []*iampb.Binding {
 		out = append(out, &iampb.Binding{Role: b.Role, Members: append([]string(nil), b.Members...)})
 	}
 	return out
+}
+
+func randomSecretPayload() []byte {
+	payload := make([]byte, 32)
+	_, _ = rand.Read(payload)
+	return payload
+}
+
+// EnableManagedRotation records the managed-rotation credential intent and
+// creates the initial rotated version. The emulator does not connect to Cloud
+// SQL, but it preserves the Secret Manager-visible behavior: a new random
+// secret version is added and becomes latest.
+func (s *Server) EnableManagedRotation(ctx context.Context, req *smpb.EnableManagedRotationRequest) (*smpb.SecretVersion, error) {
+	if req.GetParent() == "" {
+		return nil, invalidArg("parent is required")
+	}
+	return s.AddSecretVersion(ctx, &smpb.AddSecretVersionRequest{Parent: req.GetParent(), Payload: &smpb.SecretPayload{Data: randomSecretPayload()}})
+}
+
+// RotateSecret emulates an on-demand managed rotation by adding a random new
+// version. It intentionally does not enforce prior EnableManagedRotation so
+// local tests can exercise rotation without provisioning Cloud SQL.
+func (s *Server) RotateSecret(ctx context.Context, req *smpb.RotateSecretRequest) (*smpb.SecretVersion, error) {
+	if req.GetParent() == "" {
+		return nil, invalidArg("parent is required")
+	}
+	return s.AddSecretVersion(ctx, &smpb.AddSecretVersionRequest{Parent: req.GetParent(), Payload: &smpb.SecretPayload{Data: randomSecretPayload()}})
 }

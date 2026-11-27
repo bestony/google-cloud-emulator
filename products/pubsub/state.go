@@ -21,11 +21,17 @@ var (
 	subIDRe         = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9._~+%-]{2,254}$`)
 )
 
-// State holds all Pub/Sub resources in memory.
+// State holds all Pub/Sub resources and message backlogs in memory.
 type State struct {
 	mu            sync.RWMutex
 	topics        map[string]*pubsubpb.Topic
 	subscriptions map[string]*pubsubpb.Subscription
+	backlogs      map[string][]*subscriptionMessage
+	ackIndex      map[string]map[string]*subscriptionMessage
+	snapshots     map[string]*snapshotData
+	nextMessageID int64
+	nextAckID     int64
+	nextSequence  int64
 }
 
 // NewState returns an empty State.
@@ -33,6 +39,11 @@ func NewState() *State {
 	return &State{
 		topics:        make(map[string]*pubsubpb.Topic),
 		subscriptions: make(map[string]*pubsubpb.Subscription),
+		backlogs:      make(map[string][]*subscriptionMessage),
+		ackIndex:      make(map[string]map[string]*subscriptionMessage),
+		snapshots:     make(map[string]*snapshotData),
+		nextMessageID: 1,
+		nextAckID:     1,
 	}
 }
 
@@ -388,6 +399,8 @@ func (s *State) DeleteSubscription(name string) string {
 		return "not-found"
 	}
 	delete(s.subscriptions, name)
+	delete(s.backlogs, name)
+	delete(s.ackIndex, name)
 	return ""
 }
 

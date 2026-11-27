@@ -20,7 +20,9 @@ import (
 	"github.com/bestony/google-cloud-emulator/core/lro"
 	longrunningpb "github.com/bestony/google-cloud-emulator/gen/google/longrunning"
 	"github.com/bestony/google-cloud-emulator/products/compute"
+	"github.com/bestony/google-cloud-emulator/products/datastore"
 	"github.com/bestony/google-cloud-emulator/products/dns"
+	"github.com/bestony/google-cloud-emulator/products/firestore"
 	"github.com/bestony/google-cloud-emulator/products/gcs"
 	"github.com/bestony/google-cloud-emulator/products/gke"
 	iamapi "github.com/bestony/google-cloud-emulator/products/iam"
@@ -48,6 +50,8 @@ func main() {
 	sqlState := sql.NewState()
 	gkeState := gke.NewState()
 	iamState := iamapi.NewState(iamStore)
+	datastoreState := datastore.NewState()
+	firestoreState := firestore.NewState()
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
@@ -84,6 +88,12 @@ func main() {
 	if err := iamapi.Register(grpcServer, gateway, iamState); err != nil {
 		fatal(err)
 	}
+	if err := datastore.Register(grpcServer, gateway, datastoreState); err != nil {
+		fatal(err)
+	}
+	if err := firestore.Register(grpcServer, gateway, firestoreState); err != nil {
+		fatal(err)
+	}
 	// Shared google.longrunning.Operations service for all products.
 	opsServer := lro.NewServer(lroStore)
 	longrunningpb.RegisterOperationsServer(grpcServer, opsServer)
@@ -97,8 +107,10 @@ func main() {
 		_, _ = w.Write([]byte("ok"))
 	})
 	mux.Handle("/dns/v1/", dns.NewHandler(dnsState))
-	mux.Handle("/storage/v1/", gcs.NewHandler(gcsState))
-	mux.Handle("/", gke.WrapGateway(gateway))
+	gcsHandler := gcs.NewHandler(gcsState)
+	mux.Handle("/storage/v1/", gcsHandler)
+	mux.Handle("/upload/storage/v1/", gcsHandler)
+	mux.Handle("/", firestore.WrapGateway(gke.WrapGateway(gateway), firestoreState))
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isGRPC(r) {

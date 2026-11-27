@@ -20,12 +20,14 @@ func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) 
 	users := &usersServer{state: state}
 	databases := &databasesServer{state: state}
 	backupRuns := &backupRunsServer{state: state}
+	flags := &flagsServer{}
 
 	sqlpb.RegisterSqlInstancesServiceServer(grpcServer, instances)
 	sqlpb.RegisterSqlOperationsServiceServer(grpcServer, operations)
 	sqlpb.RegisterSqlUsersServiceServer(grpcServer, users)
 	sqlpb.RegisterSqlDatabasesServiceServer(grpcServer, databases)
 	sqlpb.RegisterSqlBackupRunsServiceServer(grpcServer, backupRuns)
+	sqlpb.RegisterSqlFlagsServiceServer(grpcServer, flags)
 
 	if err := sqlpb.RegisterSqlInstancesServiceHandlerServer(ctx, gateway, instances); err != nil {
 		return err
@@ -40,6 +42,9 @@ func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) 
 		return err
 	}
 	if err := sqlpb.RegisterSqlBackupRunsServiceHandlerServer(ctx, gateway, backupRuns); err != nil {
+		return err
+	}
+	if err := sqlpb.RegisterSqlFlagsServiceHandlerServer(ctx, gateway, flags); err != nil {
 		return err
 	}
 	return nil

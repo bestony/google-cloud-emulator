@@ -1,15 +1,18 @@
 // Package pubsub emulates google.pubsub.v1 over gRPC and REST (via
 // grpc-gateway). State is in-memory only.
 //
-// M1 scope: topic and subscription control-plane CRUD. The data plane
-// (Publish/Pull/Acknowledge/StreamingPull/ModifyAckDeadline/Seek/snapshots)
-// returns UNIMPLEMENTED.
+// The implementation includes topic/subscription control-plane CRUD and the
+// pull message data plane (publish, pull, acknowledge, deadlines, snapshots,
+// seek, and streaming pull) with in-memory at-least-once semantics.
 package pubsub
 
 import (
 	"context"
+	"io"
 	"strings"
+	"time"
 
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	gcperr "github.com/bestony/google-cloud-emulator/core/errors"
@@ -29,6 +32,10 @@ func stateErr(code string) error {
 	switch code {
 	case "not-found":
 		return gcperr.GRPC(gcperr.NotFound, "resource not found")
+	case "snapshot-not-found":
+		return gcperr.GRPC(gcperr.NotFound, "snapshot not found")
+	case "snapshot-subscription-mismatch":
+		return gcperr.GRPC(gcperr.FailedPrecondition, "snapshot does not belong to the subscription")
 	case "already-exists":
 		return gcperr.GRPC(gcperr.AlreadyExists, "resource already exists")
 	case "invalid-name", "invalid-parent", "invalid-topic":
@@ -211,4 +218,232 @@ func (s *SubscriberServer) ModifyPushConfig(ctx context.Context, req *pubsubpb.M
 		return nil, stateErr(code)
 	}
 	return &emptypb.Empty{}, nil
+}
+
+// --- Data plane ---
+
+func (s *PublisherServer) Publish(ctx context.Context, req *pubsubpb.PublishRequest) (*pubsubpb.PublishResponse, error) {
+	if req.GetTopic() == "" {
+		return nil, invalidArg("topic is required")
+	}
+	ids, code := s.state.PublishMessages(req.GetTopic(), req.GetMessages())
+	if code != "" {
+		return nil, stateErr(code)
+	}
+	return &pubsubpb.PublishResponse{MessageIds: ids}, nil
+}
+
+func (s *SubscriberServer) Pull(ctx context.Context, req *pubsubpb.PullRequest) (*pubsubpb.PullResponse, error) {
+	if req.GetSubscription() == "" {
+		return nil, invalidArg("subscription is required")
+	}
+	messages, code := s.state.PullMessages(req.GetSubscription(), req.GetMaxMessages(), 0)
+	if code != "" {
+		return nil, stateErr(code)
+	}
+	return &pubsubpb.PullResponse{ReceivedMessages: messages}, nil
+}
+
+func (s *SubscriberServer) Acknowledge(ctx context.Context, req *pubsubpb.AcknowledgeRequest) (*emptypb.Empty, error) {
+	if req.GetSubscription() == "" {
+		return nil, invalidArg("subscription is required")
+	}
+	if code := s.state.Acknowledge(req.GetSubscription(), req.GetAckIds()); code != "" {
+		return nil, stateErr(code)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *SubscriberServer) ModifyAckDeadline(ctx context.Context, req *pubsubpb.ModifyAckDeadlineRequest) (*emptypb.Empty, error) {
+	if req.GetSubscription() == "" {
+		return nil, invalidArg("subscription is required")
+	}
+	if code := s.state.ModifyAckDeadline(req.GetSubscription(), req.GetAckIds(), req.GetAckDeadlineSeconds()); code != "" {
+		return nil, stateErr(code)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func applyStreamingControl(state *State, subscription string, req *pubsubpb.StreamingPullRequest) error {
+	if len(req.GetModifyDeadlineAckIds()) != len(req.GetModifyDeadlineSeconds()) {
+		return invalidArg("modify_deadline_ack_ids and modify_deadline_seconds must have the same length")
+	}
+	if len(req.GetAckIds()) > 0 {
+		if code := state.Acknowledge(subscription, req.GetAckIds()); code != "" {
+			return stateErr(code)
+		}
+	}
+	for i, id := range req.GetModifyDeadlineAckIds() {
+		if code := state.ModifyAckDeadline(subscription, []string{id}, req.GetModifyDeadlineSeconds()[i]); code != "" {
+			return stateErr(code)
+		}
+	}
+	return nil
+}
+
+// StreamingPull implements a small but useful streaming receiver: the first
+// request initializes the subscription, subsequent requests carry acks and
+// deadline modifications, and the server continuously sends available batches.
+func (s *SubscriberServer) StreamingPull(stream grpc.BidiStreamingServer[pubsubpb.StreamingPullRequest, pubsubpb.StreamingPullResponse]) error {
+	first, err := stream.Recv()
+	if err == io.EOF {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	subscription := first.GetSubscription()
+	if subscription == "" {
+		return invalidArg("subscription is required in the first streaming pull request")
+	}
+	if s.state.GetSubscription(subscription) == nil {
+		return notFound("subscription %q not found", subscription)
+	}
+	deadline := first.GetStreamAckDeadlineSeconds()
+	if deadline != 0 && (deadline < 10 || deadline > 600) {
+		return invalidArg("stream_ack_deadline_seconds must be between 10 and 600")
+	}
+	if err := applyStreamingControl(s.state, subscription, first); err != nil {
+		return err
+	}
+
+	recvDone := make(chan error, 1)
+	go func() {
+		for {
+			req, err := stream.Recv()
+			if err != nil {
+				recvDone <- err
+				return
+			}
+			if req.GetSubscription() != "" {
+				recvDone <- invalidArg("subscription must only be set in the first streaming pull request")
+				return
+			}
+			if req.GetStreamAckDeadlineSeconds() != 0 && (req.GetStreamAckDeadlineSeconds() < 10 || req.GetStreamAckDeadlineSeconds() > 600) {
+				recvDone <- invalidArg("stream_ack_deadline_seconds must be between 10 and 600")
+				return
+			}
+			if err := applyStreamingControl(s.state, subscription, req); err != nil {
+				recvDone <- err
+				return
+			}
+		}
+	}()
+
+	ticker := time.NewTicker(25 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-stream.Context().Done():
+			return stream.Context().Err()
+		case err := <-recvDone:
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		default:
+		}
+
+		messages, code := s.state.PullMessages(subscription, 10, deadline)
+		if code != "" {
+			return stateErr(code)
+		}
+		if len(messages) > 0 {
+			if err := stream.Send(&pubsubpb.StreamingPullResponse{ReceivedMessages: messages}); err != nil {
+				return err
+			}
+			continue
+		}
+
+		select {
+		case <-stream.Context().Done():
+			return stream.Context().Err()
+		case err := <-recvDone:
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		case <-ticker.C:
+		}
+	}
+}
+
+// --- Snapshots and seek ---
+
+func (s *SubscriberServer) CreateSnapshot(ctx context.Context, req *pubsubpb.CreateSnapshotRequest) (*pubsubpb.Snapshot, error) {
+	if req.GetSubscription() == "" {
+		return nil, invalidArg("subscription is required")
+	}
+	snap, code := s.state.CreateSnapshot(req.GetName(), req.GetSubscription(), req.GetLabels())
+	if code != "" {
+		return nil, stateErr(code)
+	}
+	return snap, nil
+}
+
+func (s *SubscriberServer) GetSnapshot(ctx context.Context, req *pubsubpb.GetSnapshotRequest) (*pubsubpb.Snapshot, error) {
+	snap := s.state.GetSnapshot(req.GetSnapshot())
+	if snap == nil {
+		return nil, notFound("snapshot %q not found", req.GetSnapshot())
+	}
+	return snap, nil
+}
+
+func (s *SubscriberServer) ListSnapshots(ctx context.Context, req *pubsubpb.ListSnapshotsRequest) (*pubsubpb.ListSnapshotsResponse, error) {
+	if !ValidProjectParent(req.GetProject()) {
+		return nil, invalidArg("project must be of the form projects/{project}")
+	}
+	pageSize := pagination.EffectivePageSize(req.GetPageSize(), 100)
+	snaps, next, code := s.state.ListSnapshots(req.GetProject(), pageSize, req.GetPageToken())
+	if code != "" {
+		return nil, stateErr(code)
+	}
+	return &pubsubpb.ListSnapshotsResponse{Snapshots: snaps, NextPageToken: next}, nil
+}
+
+func (s *SubscriberServer) UpdateSnapshot(ctx context.Context, req *pubsubpb.UpdateSnapshotRequest) (*pubsubpb.Snapshot, error) {
+	if req.GetSnapshot() == nil || req.GetSnapshot().GetName() == "" {
+		return nil, invalidArg("snapshot.name is required")
+	}
+	var paths []string
+	if req.GetUpdateMask() != nil {
+		paths = req.GetUpdateMask().GetPaths()
+	}
+	snap, code := s.state.UpdateSnapshot(req.GetSnapshot().GetName(), req.GetSnapshot(), paths)
+	if code != "" {
+		return nil, stateErr(code)
+	}
+	return snap, nil
+}
+
+func (s *SubscriberServer) DeleteSnapshot(ctx context.Context, req *pubsubpb.DeleteSnapshotRequest) (*emptypb.Empty, error) {
+	if code := s.state.DeleteSnapshot(req.GetSnapshot()); code != "" {
+		return nil, stateErr(code)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *SubscriberServer) Seek(ctx context.Context, req *pubsubpb.SeekRequest) (*pubsubpb.SeekResponse, error) {
+	if req.GetSubscription() == "" {
+		return nil, invalidArg("subscription is required")
+	}
+	var code string
+	switch target := req.GetTarget().(type) {
+	case *pubsubpb.SeekRequest_Time:
+		if target.Time == nil {
+			return nil, invalidArg("seek time is required")
+		}
+		code = s.state.SeekToTime(req.GetSubscription(), target.Time.AsTime())
+	case *pubsubpb.SeekRequest_Snapshot:
+		if target.Snapshot == "" {
+			return nil, invalidArg("seek snapshot is required")
+		}
+		code = s.state.SeekToSnapshot(req.GetSubscription(), target.Snapshot)
+	default:
+		return nil, invalidArg("seek target is required")
+	}
+	if code != "" {
+		return nil, stateErr(code)
+	}
+	return &pubsubpb.SeekResponse{}, nil
 }

@@ -17,9 +17,9 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	smpb "github.com/bestony/google-cloud-emulator/gen/google/cloud/secretmanager/v1"
 	"github.com/bestony/google-cloud-emulator/core/iam"
 	"github.com/bestony/google-cloud-emulator/core/pagination"
+	smpb "github.com/bestony/google-cloud-emulator/gen/google/cloud/secretmanager/v1"
 )
 
 var (
@@ -121,9 +121,9 @@ func etagOf(sec *Secret) string {
 
 func versionProto(secName string, v *Version) *smpb.SecretVersion {
 	out := &smpb.SecretVersion{
-		Name:      fmt.Sprintf("%s/versions/%d", secName, v.Number),
+		Name:       fmt.Sprintf("%s/versions/%d", secName, v.Number),
 		CreateTime: timestamppb.New(v.CreateTime),
-		State:     v.State,
+		State:      v.State,
 	}
 	if v.DestroyTime != nil {
 		out.DestroyTime = timestamppb.New(*v.DestroyTime)
@@ -177,19 +177,19 @@ func (s *State) CreateSecret(parent, id string, tmpl *smpb.Secret) (*smpb.Secret
 	}
 	sec := &Secret{
 		Proto: &smpb.Secret{
-			Name:                  name,
-			Replication:           tmpl.GetReplication(),
-			Labels:                cloneStringMap(tmpl.Labels),
-			Topics:                cloneTopics(tmpl.Topics),
-			Rotation:              cloneRotation(tmpl.Rotation),
-			VersionAliases:        map[string]int64{},
-			Annotations:           cloneStringMap(tmpl.Annotations),
-			VersionDestroyTtl:     tmpl.VersionDestroyTtl,
+			Name:                      name,
+			Replication:               tmpl.GetReplication(),
+			Labels:                    cloneStringMap(tmpl.Labels),
+			Topics:                    cloneTopics(tmpl.Topics),
+			Rotation:                  cloneRotation(tmpl.Rotation),
+			VersionAliases:            map[string]int64{},
+			Annotations:               cloneStringMap(tmpl.Annotations),
+			VersionDestroyTtl:         tmpl.VersionDestroyTtl,
 			CustomerManagedEncryption: tmpl.CustomerManagedEncryption,
-			Tags:                  cloneStringMap(tmpl.Tags),
-			SecretType:            tmpl.SecretType,
-			State:                 smpb.Secret_STATE_ACTIVE,
-			CreateTime:            timestamppb.New(now()),
+			Tags:                      cloneStringMap(tmpl.Tags),
+			SecretType:                tmpl.SecretType,
+			State:                     smpb.Secret_STATE_ACTIVE,
+			CreateTime:                timestamppb.New(now()),
 		},
 		Versions:    map[int64]*Version{},
 		NextVersion: 1,

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 	"sort"
 	"strconv"
@@ -40,27 +41,47 @@ func writeError(w http.ResponseWriter, code gcperr.Code, format string, args ...
 	gcperr.WriteREST(w, code, format, args...)
 }
 
-// ServeHTTP routes /storage/v1/... requests.
+// ServeHTTP routes /storage/v1/... and /upload/storage/v1/... requests.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-	if !strings.HasPrefix(path, "/storage/v1/") {
-		writeError(w, gcperr.NotFound, "unknown path %q", path)
+	escapedPath := r.URL.EscapedPath()
+	var segs []string
+	upload := false
+	if strings.HasPrefix(escapedPath, "/storage/v1/") {
+		segs = splitEscapedPath(strings.TrimPrefix(escapedPath, "/storage/v1/"))
+	} else if strings.HasPrefix(escapedPath, "/upload/storage/v1/") {
+		segs = splitEscapedPath(strings.TrimPrefix(escapedPath, "/upload/storage/v1/"))
+		upload = true
+	} else {
+		writeError(w, gcperr.NotFound, "unknown path %q", r.URL.Path)
 		return
 	}
-	segs := strings.Split(strings.TrimPrefix(path, "/storage/v1/"), "/")
 	if len(segs) == 0 || segs[0] == "" {
-		writeError(w, gcperr.NotFound, "unknown path %q", path)
+		writeError(w, gcperr.NotFound, "unknown path %q", r.URL.Path)
 		return
 	}
 
+	if upload {
+		h.routeUpload(w, r, segs)
+		return
+	}
 	switch segs[0] {
 	case "b":
 		h.routeBuckets(w, r, segs[1:])
-	case "upload":
-		writeError(w, gcperr.Unimplemented, "object upload is not implemented by the emulator")
 	default:
-		writeError(w, gcperr.NotFound, "unknown path %q", path)
+		writeError(w, gcperr.NotFound, "unknown path %q", r.URL.Path)
 	}
+}
+
+// splitEscapedPath splits before unescaping each segment, so an object name
+// containing a slash can be addressed as a single %2F-escaped path segment.
+func splitEscapedPath(path string) []string {
+	raw := strings.Split(path, "/")
+	for i, seg := range raw {
+		if decoded, err := url.PathUnescape(seg); err == nil {
+			raw[i] = decoded
+		}
+	}
+	return raw
 }
 
 func (h *Handler) routeBuckets(w http.ResponseWriter, r *http.Request, segs []string) {
@@ -95,9 +116,8 @@ func (h *Handler) routeBuckets(w http.ResponseWriter, r *http.Request, segs []st
 		h.bucketIAM(w, r, name, segs[2:])
 		return
 	}
-	if strings.HasPrefix(segs[1], "o") {
-		// /o, /o/{object}, and nested rewrite paths are the object data plane.
-		writeError(w, gcperr.Unimplemented, "object data plane is not implemented by the emulator")
+	if segs[1] == "o" {
+		h.routeObjects(w, r, name, segs[2:])
 		return
 	}
 	writeError(w, gcperr.NotFound, "unknown path %q", r.URL.Path)

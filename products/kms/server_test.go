@@ -2,7 +2,13 @@ package kms
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"io"
 	"net"
 	"net/http"
@@ -18,9 +24,9 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	"github.com/bestony/google-cloud-emulator/core/lro"
 	kmspb "github.com/bestony/google-cloud-emulator/gen/google/cloud/kms/v1"
 	longrunningpb "github.com/bestony/google-cloud-emulator/gen/google/longrunning"
-	"github.com/bestony/google-cloud-emulator/core/lro"
 )
 
 func newTestServer(t *testing.T) (*Server, *lro.Store) {
@@ -30,10 +36,10 @@ func newTestServer(t *testing.T) (*Server, *lro.Store) {
 }
 
 const (
-	krParent  = "projects/demo/locations/us-east1"
-	krName    = "projects/demo/locations/us-east1/keyRings/main"
-	ckName    = "projects/demo/locations/us-east1/keyRings/main/cryptoKeys/my-key"
-	v1Name    = ckName + "/cryptoKeyVersions/1"
+	krParent = "projects/demo/locations/us-east1"
+	krName   = "projects/demo/locations/us-east1/keyRings/main"
+	ckName   = "projects/demo/locations/us-east1/keyRings/main/cryptoKeys/my-key"
+	v1Name   = ckName + "/cryptoKeyVersions/1"
 )
 
 func TestKeyRingLifecycle(t *testing.T) {
@@ -105,8 +111,8 @@ func TestCryptoKeyAndVersionLifecycle(t *testing.T) {
 
 	// Update key labels.
 	upd, err := srv.UpdateCryptoKey(ctx, &kmspb.UpdateCryptoKeyRequest{
-		CryptoKey:   &kmspb.CryptoKey{Name: ckName, Labels: map[string]string{"team": "platform"}},
-		UpdateMask:  &fieldmaskpb.FieldMask{Paths: []string{"labels"}},
+		CryptoKey:  &kmspb.CryptoKey{Name: ckName, Labels: map[string]string{"team": "platform"}},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"labels"}},
 	})
 	if err != nil || upd.Labels["team"] != "platform" {
 		t.Fatalf("UpdateCryptoKey: %v %+v", err, upd)
@@ -199,11 +205,59 @@ func TestDeleteCryptoKeyLRO(t *testing.T) {
 	}
 }
 
-func TestDataPlaneUnimplemented(t *testing.T) {
+func TestSymmetricEncryptDecryptRoundTrip(t *testing.T) {
 	srv, _ := newTestServer(t)
 	ctx := context.Background()
-	if _, err := srv.Encrypt(ctx, &kmspb.EncryptRequest{Name: "x", Plaintext: []byte("a")}); status.Code(err) != codes.Unimplemented {
-		t.Fatalf("Encrypt: got %v, want Unimplemented", err)
+	if _, err := srv.CreateKeyRing(ctx, &kmspb.CreateKeyRingRequest{Parent: krParent, KeyRingId: "main"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := srv.CreateCryptoKey(ctx, &kmspb.CreateCryptoKeyRequest{Parent: krName, CryptoKeyId: "my-key", CryptoKey: &kmspb.CryptoKey{Purpose: kmspb.CryptoKey_ENCRYPT_DECRYPT}}); err != nil {
+		t.Fatal(err)
+	}
+	enc, err := srv.Encrypt(ctx, &kmspb.EncryptRequest{Name: ckName, Plaintext: []byte("hello"), AdditionalAuthenticatedData: []byte("aad")})
+	if err != nil {
+		t.Fatalf("Encrypt: %v", err)
+	}
+	if enc.Name != v1Name || len(enc.Ciphertext) == 0 || enc.CiphertextCrc32C == nil {
+		t.Fatalf("unexpected encrypt response: %+v", enc)
+	}
+	dec, err := srv.Decrypt(ctx, &kmspb.DecryptRequest{Name: ckName, Ciphertext: enc.Ciphertext, AdditionalAuthenticatedData: []byte("aad")})
+	if err != nil {
+		t.Fatalf("Decrypt: %v", err)
+	}
+	if string(dec.Plaintext) != "hello" || !dec.UsedPrimary {
+		t.Fatalf("unexpected decrypt response: %+v", dec)
+	}
+	if _, err := srv.Decrypt(ctx, &kmspb.DecryptRequest{Name: ckName, Ciphertext: enc.Ciphertext, AdditionalAuthenticatedData: []byte("wrong")}); status.Code(err) != codes.InvalidArgument {
+		t.Fatalf("decrypt wrong AAD: got %v", err)
+	}
+}
+
+func TestMacSignVerifyAndRandomBytes(t *testing.T) {
+	srv, _ := newTestServer(t)
+	ctx := context.Background()
+	if _, err := srv.CreateKeyRing(ctx, &kmspb.CreateKeyRingRequest{Parent: krParent, KeyRingId: "main"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := srv.CreateCryptoKey(ctx, &kmspb.CreateCryptoKeyRequest{Parent: krName, CryptoKeyId: "mac", CryptoKey: &kmspb.CryptoKey{Purpose: kmspb.CryptoKey_MAC}}); err != nil {
+		t.Fatal(err)
+	}
+	version := krName + "/cryptoKeys/mac/cryptoKeyVersions/1"
+	sign, err := srv.MacSign(ctx, &kmspb.MacSignRequest{Name: version, Data: []byte("message")})
+	if err != nil {
+		t.Fatalf("MacSign: %v", err)
+	}
+	verify, err := srv.MacVerify(ctx, &kmspb.MacVerifyRequest{Name: version, Data: []byte("message"), Mac: sign.Mac})
+	if err != nil || !verify.Success {
+		t.Fatalf("MacVerify: %v %+v", err, verify)
+	}
+	verify, err = srv.MacVerify(ctx, &kmspb.MacVerifyRequest{Name: version, Data: []byte("tampered"), Mac: sign.Mac})
+	if err != nil || verify.Success {
+		t.Fatalf("tampered MacVerify: %v %+v", err, verify)
+	}
+	random, err := srv.GenerateRandomBytes(ctx, &kmspb.GenerateRandomBytesRequest{Location: krParent, LengthBytes: 32, ProtectionLevel: kmspb.ProtectionLevel_HSM})
+	if err != nil || len(random.Data) != 32 || random.DataCrc32C == nil {
+		t.Fatalf("GenerateRandomBytes: %v %+v", err, random)
 	}
 }
 
@@ -290,15 +344,22 @@ func TestRESTGateway(t *testing.T) {
 		t.Fatalf("unexpected primary: %v", ck["primary"])
 	}
 
-	// Encrypt must be 501.
+	// Encrypt succeeds through the REST gateway.
 	resp3, err := http.Post(ts.URL+"/v1/"+krName+"/cryptoKeys/rest-key:encrypt", "application/json", strings.NewReader(`{"plaintext":"aGk="}`))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer resp3.Body.Close()
-	if resp3.StatusCode != 501 {
+	if resp3.StatusCode != 200 {
 		raw, _ := io.ReadAll(resp3.Body)
-		t.Fatalf("encrypt status = %d, want 501 body=%s", resp3.StatusCode, raw)
+		t.Fatalf("encrypt status = %d body=%s", resp3.StatusCode, raw)
+	}
+	var enc map[string]any
+	if err := json.NewDecoder(resp3.Body).Decode(&enc); err != nil {
+		t.Fatal(err)
+	}
+	if enc["ciphertext"] == "" || enc["name"] != krName+"/cryptoKeys/rest-key/cryptoKeyVersions/1" {
+		t.Fatalf("unexpected encrypt response: %v", enc)
 	}
 
 	// DeleteCryptoKey returns an LRO via REST.
@@ -322,3 +383,82 @@ func TestRESTGateway(t *testing.T) {
 }
 
 var _ = longrunningpb.Operation{}
+
+func TestAsymmetricAndRawCryptoRoundTrips(t *testing.T) {
+	srv, _ := newTestServer(t)
+	ctx := context.Background()
+	if _, err := srv.CreateKeyRing(ctx, &kmspb.CreateKeyRingRequest{Parent: krParent, KeyRingId: "main"}); err != nil {
+		t.Fatal(err)
+	}
+	// EC signing key: default algorithm EC_SIGN_P256_SHA256.
+	if _, err := srv.CreateCryptoKey(ctx, &kmspb.CreateCryptoKeyRequest{Parent: krName, CryptoKeyId: "ec", CryptoKey: &kmspb.CryptoKey{Purpose: kmspb.CryptoKey_ASYMMETRIC_SIGN}}); err != nil {
+		t.Fatal(err)
+	}
+	ecVersion := krName + "/cryptoKeys/ec/cryptoKeyVersions/1"
+	digest := sha256.Sum256([]byte("signed"))
+	sign, err := srv.AsymmetricSign(ctx, &kmspb.AsymmetricSignRequest{Name: ecVersion, Digest: &kmspb.Digest{Digest: &kmspb.Digest_Sha256{Sha256: digest[:]}}})
+	if err != nil {
+		t.Fatalf("AsymmetricSign: %v", err)
+	}
+	pub, err := srv.GetPublicKey(ctx, &kmspb.GetPublicKeyRequest{Name: ecVersion})
+	if err != nil {
+		t.Fatalf("GetPublicKey: %v", err)
+	}
+	block, _ := pem.Decode([]byte(pub.Pem))
+	if block == nil {
+		t.Fatal("public key PEM did not decode")
+	}
+	parsed, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ecdsa.VerifyASN1(parsed.(*ecdsa.PublicKey), digest[:], sign.Signature) {
+		t.Fatal("ECDSA signature did not verify")
+	}
+
+	// RSA decryption key: encrypt with public key, decrypt through KMS.
+	if _, err := srv.CreateCryptoKey(ctx, &kmspb.CreateCryptoKeyRequest{Parent: krName, CryptoKeyId: "rsa", CryptoKey: &kmspb.CryptoKey{Purpose: kmspb.CryptoKey_ASYMMETRIC_DECRYPT}}); err != nil {
+		t.Fatal(err)
+	}
+	rsaVersion := krName + "/cryptoKeys/rsa/cryptoKeyVersions/1"
+	rsaPubResp, err := srv.GetPublicKey(ctx, &kmspb.GetPublicKeyRequest{Name: rsaVersion})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rsaBlock, _ := pem.Decode([]byte(rsaPubResp.Pem))
+	rsaParsed, err := x509.ParsePKIXPublicKey(rsaBlock.Bytes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ciphertext, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, rsaParsed.(*rsa.PublicKey), []byte("secret"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dec, err := srv.AsymmetricDecrypt(ctx, &kmspb.AsymmetricDecryptRequest{Name: rsaVersion, Ciphertext: ciphertext})
+	if err != nil {
+		t.Fatalf("AsymmetricDecrypt: %v", err)
+	}
+	if string(dec.Plaintext) != "secret" {
+		t.Fatalf("plaintext = %q", dec.Plaintext)
+	}
+
+	// Raw AES-GCM round trip on a key explicitly templated for raw operations.
+	if _, err := srv.CreateCryptoKey(ctx, &kmspb.CreateCryptoKeyRequest{Parent: krName, CryptoKeyId: "raw", CryptoKey: &kmspb.CryptoKey{
+		Purpose:         kmspb.CryptoKey_ENCRYPT_DECRYPT,
+		VersionTemplate: &kmspb.CryptoKeyVersionTemplate{Algorithm: kmspb.CryptoKeyVersion_AES_256_GCM},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	rawVersion := krName + "/cryptoKeys/raw/cryptoKeyVersions/1"
+	rawEnc, err := srv.RawEncrypt(ctx, &kmspb.RawEncryptRequest{Name: rawVersion, Plaintext: []byte("raw plaintext"), AdditionalAuthenticatedData: []byte("aad")})
+	if err != nil {
+		t.Fatalf("RawEncrypt: %v", err)
+	}
+	rawDec, err := srv.RawDecrypt(ctx, &kmspb.RawDecryptRequest{Name: rawVersion, Ciphertext: rawEnc.Ciphertext, InitializationVector: rawEnc.InitializationVector, AdditionalAuthenticatedData: []byte("aad")})
+	if err != nil {
+		t.Fatalf("RawDecrypt: %v", err)
+	}
+	if string(rawDec.Plaintext) != "raw plaintext" {
+		t.Fatalf("raw plaintext = %q", rawDec.Plaintext)
+	}
+}

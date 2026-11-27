@@ -19,9 +19,9 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	kmspb "github.com/bestony/google-cloud-emulator/gen/google/cloud/kms/v1"
 	"github.com/bestony/google-cloud-emulator/core/lro"
 	"github.com/bestony/google-cloud-emulator/core/pagination"
+	kmspb "github.com/bestony/google-cloud-emulator/gen/google/cloud/kms/v1"
 )
 
 var (
@@ -34,18 +34,19 @@ var (
 
 // CryptoKeyEntry is a crypto key plus its versions.
 type CryptoKeyEntry struct {
-	Proto          *kmspb.CryptoKey
-	Versions       map[string]*kmspb.CryptoKeyVersion // version id (numeric string) -> version
-	NextVersion    int64
+	Proto           *kmspb.CryptoKey
+	Versions        map[string]*kmspb.CryptoKeyVersion // version id (numeric string) -> version
+	Material        map[string]*keyMaterial            // version id -> generated key material
+	NextVersion     int64
 	TrustedWrapping bool
 }
 
 // State holds all KMS resources in memory.
 type State struct {
-	mu          sync.RWMutex
-	keyRings    map[string]*kmspb.KeyRing
-	cryptoKeys  map[string]*CryptoKeyEntry
-	lro         *lro.Store
+	mu         sync.RWMutex
+	keyRings   map[string]*kmspb.KeyRing
+	cryptoKeys map[string]*CryptoKeyEntry
+	lro        *lro.Store
 }
 
 // NewState returns an empty State backed by the shared LRO store.
@@ -197,9 +198,9 @@ func (s *State) CreateCryptoKey(parent, cryptoKeyID string, ck *kmspb.CryptoKey,
 			DestroyScheduledDuration: cloneDuration(src.DestroyScheduledDuration),
 			CryptoKeyBackend:         src.GetCryptoKeyBackend(),
 		},
-		Versions:         make(map[string]*kmspb.CryptoKeyVersion),
-		NextVersion:      1,
-		TrustedWrapping:  trustedWrapping,
+		Versions:        make(map[string]*kmspb.CryptoKeyVersion),
+		NextVersion:     1,
+		TrustedWrapping: trustedWrapping,
 	}
 	if !skipInitial {
 		s.addVersionLocked(entry, "1")
@@ -223,12 +224,12 @@ func (s *State) addVersionLocked(entry *CryptoKeyEntry, versionID string) {
 		}
 	}
 	v := &kmspb.CryptoKeyVersion{
-		Name:           entry.Proto.GetName() + "/cryptoKeyVersions/" + versionID,
-		State:          kmspb.CryptoKeyVersion_ENABLED,
-		ProtectionLevel: protection,
-		Algorithm:      algorithm,
-		CreateTime:     now(),
-		GenerateTime:   now(),
+		Name:                   entry.Proto.GetName() + "/cryptoKeyVersions/" + versionID,
+		State:                  kmspb.CryptoKeyVersion_ENABLED,
+		ProtectionLevel:        protection,
+		Algorithm:              algorithm,
+		CreateTime:             now(),
+		GenerateTime:           now(),
 		TrustedWrappingEnabled: entry.TrustedWrapping,
 	}
 	entry.Versions[versionID] = v
@@ -282,12 +283,12 @@ func (s *State) ListCryptoKeys(parent string, pageSize int, pageToken string) ([
 
 // cryptoKeyMutableFields are the UpdateCryptoKey mask paths the emulator supports.
 var cryptoKeyMutableFields = map[string]bool{
-	"labels":                      true,
-	"next_rotation_time":          true,
-	"rotation_period":             true,
-	"rotation_schedule":           true,
-	"version_template":            true,
-	"destroy_scheduled_duration":  true,
+	"labels":                     true,
+	"next_rotation_time":         true,
+	"rotation_period":            true,
+	"rotation_schedule":          true,
+	"version_template":           true,
+	"destroy_scheduled_duration": true,
 }
 
 // UpdateCryptoKey applies whitelisted mask paths; code "" or error string.

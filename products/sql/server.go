@@ -616,3 +616,44 @@ func (s *backupRunsServer) Delete(_ context.Context, req *sqlpb.SqlBackupRunsDel
 	s.state.mu.Unlock()
 	return op, nil
 }
+
+func (s *instancesServer) Export(_ context.Context, req *sqlpb.SqlInstancesExportRequest) (*sqlpb.Operation, error) {
+	if req.GetProject() == "" || req.GetInstance() == "" || req.GetBody() == nil {
+		return nil, invalidArg("project, instance and export body are required")
+	}
+	s.state.mu.Lock()
+	defer s.state.mu.Unlock()
+	inst, ok := s.state.instances[instanceKey(req.GetProject(), req.GetInstance())]
+	if !ok {
+		return nil, notFound("instance", req.GetProject(), req.GetInstance())
+	}
+	return s.state.addOperation(req.GetProject(), sqlpb.Operation_EXPORT, inst.GetName(), inst.GetSelfLink()), nil
+}
+
+func (s *instancesServer) Import(_ context.Context, req *sqlpb.SqlInstancesImportRequest) (*sqlpb.Operation, error) {
+	if req.GetProject() == "" || req.GetInstance() == "" || req.GetBody() == nil {
+		return nil, invalidArg("project, instance and import body are required")
+	}
+	s.state.mu.Lock()
+	defer s.state.mu.Unlock()
+	inst, ok := s.state.instances[instanceKey(req.GetProject(), req.GetInstance())]
+	if !ok {
+		return nil, notFound("instance", req.GetProject(), req.GetInstance())
+	}
+	return s.state.addOperation(req.GetProject(), sqlpb.Operation_IMPORT, inst.GetName(), inst.GetSelfLink()), nil
+}
+
+type flagsServer struct {
+	sqlpb.UnimplementedSqlFlagsServiceServer
+}
+
+func (s *flagsServer) List(context.Context, *sqlpb.SqlFlagsListRequest) (*sqlpb.FlagsListResponse, error) {
+	return &sqlpb.FlagsListResponse{Kind: "sql#flagsList", Items: []*sqlpb.Flag{
+		{Kind: "sql#flag", Name: "max_connections", Type: sqlpb.SqlFlagType_INTEGER},
+		{Kind: "sql#flag", Name: "slow_query_log", Type: sqlpb.SqlFlagType_BOOLEAN},
+		{Kind: "sql#flag", Name: "cloudsql_iam_authentication", Type: sqlpb.SqlFlagType_BOOLEAN},
+		{Kind: "sql#flag", Name: "log_checkpoints", Type: sqlpb.SqlFlagType_BOOLEAN},
+		{Kind: "sql#flag", Name: "max_wal_size", Type: sqlpb.SqlFlagType_INTEGER},
+		{Kind: "sql#flag", Name: "default_transaction_isolation", Type: sqlpb.SqlFlagType_STRING, AllowedStringValues: []string{"read committed", "repeatable read", "serializable"}},
+	}}, nil
+}
