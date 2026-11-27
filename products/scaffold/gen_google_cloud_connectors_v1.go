@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.connectors.v1.Connectors",
 		func(s grpc.ServiceRegistrar) { pb.RegisterConnectorsServer(s, &pb.UnimplementedConnectorsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterConnectorsHandlerServer(ctx, mux, &pb.UnimplementedConnectorsServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterConnectorsHandlerServer(ctx, mux, &pb.UnimplementedConnectorsServer{})
+		},
 	)
 }

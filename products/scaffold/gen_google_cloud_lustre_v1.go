@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.lustre.v1.Lustre",
 		func(s grpc.ServiceRegistrar) { pb.RegisterLustreServer(s, &pb.UnimplementedLustreServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterLustreHandlerServer(ctx, mux, &pb.UnimplementedLustreServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterLustreHandlerServer(ctx, mux, &pb.UnimplementedLustreServer{})
+		},
 	)
 }

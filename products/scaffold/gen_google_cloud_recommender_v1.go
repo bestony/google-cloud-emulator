@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.recommender.v1.Recommender",
 		func(s grpc.ServiceRegistrar) { pb.RegisterRecommenderServer(s, &pb.UnimplementedRecommenderServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRecommenderHandlerServer(ctx, mux, &pb.UnimplementedRecommenderServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterRecommenderHandlerServer(ctx, mux, &pb.UnimplementedRecommenderServer{})
+		},
 	)
 }

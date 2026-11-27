@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterRecaptchaEnterpriseServiceServer(s, &pb.UnimplementedRecaptchaEnterpriseServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRecaptchaEnterpriseServiceHandlerServer(ctx, mux, &pb.UnimplementedRecaptchaEnterpriseServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterRecaptchaEnterpriseServiceServer(s, &pb.UnimplementedRecaptchaEnterpriseServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterRecaptchaEnterpriseServiceHandlerServer(ctx, mux, &pb.UnimplementedRecaptchaEnterpriseServiceServer{})
+		},
 	)
 }

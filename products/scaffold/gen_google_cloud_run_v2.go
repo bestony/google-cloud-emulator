@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.run.v2.Revisions",
 		func(s grpc.ServiceRegistrar) { pb.RegisterRevisionsServer(s, &pb.UnimplementedRevisionsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRevisionsHandlerServer(ctx, mux, &pb.UnimplementedRevisionsServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterRevisionsHandlerServer(ctx, mux, &pb.UnimplementedRevisionsServer{})
+		},
 	)
 }

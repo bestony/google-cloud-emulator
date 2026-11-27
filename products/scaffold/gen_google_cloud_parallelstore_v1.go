@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.parallelstore.v1.Parallelstore",
-		func(s grpc.ServiceRegistrar) { pb.RegisterParallelstoreServer(s, &pb.UnimplementedParallelstoreServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterParallelstoreHandlerServer(ctx, mux, &pb.UnimplementedParallelstoreServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterParallelstoreServer(s, &pb.UnimplementedParallelstoreServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterParallelstoreHandlerServer(ctx, mux, &pb.UnimplementedParallelstoreServer{})
+		},
 	)
 }

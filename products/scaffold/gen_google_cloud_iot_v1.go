@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.iot.v1.DeviceManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDeviceManagerServer(s, &pb.UnimplementedDeviceManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDeviceManagerHandlerServer(ctx, mux, &pb.UnimplementedDeviceManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDeviceManagerServer(s, &pb.UnimplementedDeviceManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDeviceManagerHandlerServer(ctx, mux, &pb.UnimplementedDeviceManagerServer{})
+		},
 	)
 }

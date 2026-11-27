@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.agentregistry.v1.AgentRegistry",
-		func(s grpc.ServiceRegistrar) { pb.RegisterAgentRegistryServer(s, &pb.UnimplementedAgentRegistryServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAgentRegistryHandlerServer(ctx, mux, &pb.UnimplementedAgentRegistryServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterAgentRegistryServer(s, &pb.UnimplementedAgentRegistryServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAgentRegistryHandlerServer(ctx, mux, &pb.UnimplementedAgentRegistryServer{})
+		},
 	)
 }

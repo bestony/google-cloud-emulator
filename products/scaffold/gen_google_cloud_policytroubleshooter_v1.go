@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.policytroubleshooter.v1.IamChecker",
 		func(s grpc.ServiceRegistrar) { pb.RegisterIamCheckerServer(s, &pb.UnimplementedIamCheckerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterIamCheckerHandlerServer(ctx, mux, &pb.UnimplementedIamCheckerServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterIamCheckerHandlerServer(ctx, mux, &pb.UnimplementedIamCheckerServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.storagebatchoperations.v1.StorageBatchOperations",
-		func(s grpc.ServiceRegistrar) { pb.RegisterStorageBatchOperationsServer(s, &pb.UnimplementedStorageBatchOperationsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterStorageBatchOperationsHandlerServer(ctx, mux, &pb.UnimplementedStorageBatchOperationsServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterStorageBatchOperationsServer(s, &pb.UnimplementedStorageBatchOperationsServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterStorageBatchOperationsHandlerServer(ctx, mux, &pb.UnimplementedStorageBatchOperationsServer{})
+		},
 	)
 }

@@ -12,11 +12,17 @@ import (
 
 func init() {
 	registerEntry("google.cloud.texttospeech.v1.TextToSpeechLongAudioSynthesize",
-		func(s grpc.ServiceRegistrar) { pb.RegisterTextToSpeechLongAudioSynthesizeServer(s, &pb.UnimplementedTextToSpeechLongAudioSynthesizeServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterTextToSpeechLongAudioSynthesizeHandlerServer(ctx, mux, &pb.UnimplementedTextToSpeechLongAudioSynthesizeServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterTextToSpeechLongAudioSynthesizeServer(s, &pb.UnimplementedTextToSpeechLongAudioSynthesizeServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterTextToSpeechLongAudioSynthesizeHandlerServer(ctx, mux, &pb.UnimplementedTextToSpeechLongAudioSynthesizeServer{})
+		},
 	)
 	registerEntry("google.cloud.texttospeech.v1.TextToSpeech",
 		func(s grpc.ServiceRegistrar) { pb.RegisterTextToSpeechServer(s, &pb.UnimplementedTextToSpeechServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterTextToSpeechHandlerServer(ctx, mux, &pb.UnimplementedTextToSpeechServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterTextToSpeechHandlerServer(ctx, mux, &pb.UnimplementedTextToSpeechServer{})
+		},
 	)
 }

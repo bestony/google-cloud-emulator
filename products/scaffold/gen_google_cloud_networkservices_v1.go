@@ -12,11 +12,17 @@ import (
 
 func init() {
 	registerEntry("google.cloud.networkservices.v1.NetworkServices",
-		func(s grpc.ServiceRegistrar) { pb.RegisterNetworkServicesServer(s, &pb.UnimplementedNetworkServicesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterNetworkServicesHandlerServer(ctx, mux, &pb.UnimplementedNetworkServicesServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterNetworkServicesServer(s, &pb.UnimplementedNetworkServicesServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterNetworkServicesHandlerServer(ctx, mux, &pb.UnimplementedNetworkServicesServer{})
+		},
 	)
 	registerEntry("google.cloud.networkservices.v1.DepService",
 		func(s grpc.ServiceRegistrar) { pb.RegisterDepServiceServer(s, &pb.UnimplementedDepServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDepServiceHandlerServer(ctx, mux, &pb.UnimplementedDepServiceServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDepServiceHandlerServer(ctx, mux, &pb.UnimplementedDepServiceServer{})
+		},
 	)
 }

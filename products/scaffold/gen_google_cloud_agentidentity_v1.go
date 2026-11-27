@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.agentidentity.v1.AuthProviderService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterAuthProviderServiceServer(s, &pb.UnimplementedAuthProviderServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAuthProviderServiceHandlerServer(ctx, mux, &pb.UnimplementedAuthProviderServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterAuthProviderServiceServer(s, &pb.UnimplementedAuthProviderServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAuthProviderServiceHandlerServer(ctx, mux, &pb.UnimplementedAuthProviderServiceServer{})
+		},
 	)
 }

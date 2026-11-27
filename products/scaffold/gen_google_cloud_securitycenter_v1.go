@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.securitycenter.v1.SecurityCenter",
-		func(s grpc.ServiceRegistrar) { pb.RegisterSecurityCenterServer(s, &pb.UnimplementedSecurityCenterServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSecurityCenterHandlerServer(ctx, mux, &pb.UnimplementedSecurityCenterServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterSecurityCenterServer(s, &pb.UnimplementedSecurityCenterServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSecurityCenterHandlerServer(ctx, mux, &pb.UnimplementedSecurityCenterServer{})
+		},
 	)
 }

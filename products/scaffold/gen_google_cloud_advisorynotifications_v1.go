@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.advisorynotifications.v1.AdvisoryNotificationsService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterAdvisoryNotificationsServiceServer(s, &pb.UnimplementedAdvisoryNotificationsServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAdvisoryNotificationsServiceHandlerServer(ctx, mux, &pb.UnimplementedAdvisoryNotificationsServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterAdvisoryNotificationsServiceServer(s, &pb.UnimplementedAdvisoryNotificationsServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAdvisoryNotificationsServiceHandlerServer(ctx, mux, &pb.UnimplementedAdvisoryNotificationsServiceServer{})
+		},
 	)
 }

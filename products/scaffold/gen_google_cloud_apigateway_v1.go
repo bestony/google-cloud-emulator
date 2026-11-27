@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.apigateway.v1.ApiGatewayService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterApiGatewayServiceServer(s, &pb.UnimplementedApiGatewayServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterApiGatewayServiceHandlerServer(ctx, mux, &pb.UnimplementedApiGatewayServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterApiGatewayServiceServer(s, &pb.UnimplementedApiGatewayServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterApiGatewayServiceHandlerServer(ctx, mux, &pb.UnimplementedApiGatewayServiceServer{})
+		},
 	)
 }

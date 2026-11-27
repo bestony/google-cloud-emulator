@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.ids.v1.IDS",
 		func(s grpc.ServiceRegistrar) { pb.RegisterIDSServer(s, &pb.UnimplementedIDSServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterIDSHandlerServer(ctx, mux, &pb.UnimplementedIDSServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterIDSHandlerServer(ctx, mux, &pb.UnimplementedIDSServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.certificatemanager.v1.CertificateManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCertificateManagerServer(s, &pb.UnimplementedCertificateManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCertificateManagerHandlerServer(ctx, mux, &pb.UnimplementedCertificateManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCertificateManagerServer(s, &pb.UnimplementedCertificateManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCertificateManagerHandlerServer(ctx, mux, &pb.UnimplementedCertificateManagerServer{})
+		},
 	)
 }

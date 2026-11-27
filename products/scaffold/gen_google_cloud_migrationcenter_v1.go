@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.migrationcenter.v1.MigrationCenter",
-		func(s grpc.ServiceRegistrar) { pb.RegisterMigrationCenterServer(s, &pb.UnimplementedMigrationCenterServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterMigrationCenterHandlerServer(ctx, mux, &pb.UnimplementedMigrationCenterServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterMigrationCenterServer(s, &pb.UnimplementedMigrationCenterServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterMigrationCenterHandlerServer(ctx, mux, &pb.UnimplementedMigrationCenterServer{})
+		},
 	)
 }

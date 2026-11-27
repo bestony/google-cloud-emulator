@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.storagetransfer.v1.StorageTransferService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterStorageTransferServiceServer(s, &pb.UnimplementedStorageTransferServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterStorageTransferServiceHandlerServer(ctx, mux, &pb.UnimplementedStorageTransferServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterStorageTransferServiceServer(s, &pb.UnimplementedStorageTransferServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterStorageTransferServiceHandlerServer(ctx, mux, &pb.UnimplementedStorageTransferServiceServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.oracledatabase.v1.OracleDatabase",
-		func(s grpc.ServiceRegistrar) { pb.RegisterOracleDatabaseServer(s, &pb.UnimplementedOracleDatabaseServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterOracleDatabaseHandlerServer(ctx, mux, &pb.UnimplementedOracleDatabaseServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterOracleDatabaseServer(s, &pb.UnimplementedOracleDatabaseServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterOracleDatabaseHandlerServer(ctx, mux, &pb.UnimplementedOracleDatabaseServer{})
+		},
 	)
 }

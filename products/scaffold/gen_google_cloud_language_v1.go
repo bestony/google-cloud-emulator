@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.language.v1.LanguageService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterLanguageServiceServer(s, &pb.UnimplementedLanguageServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterLanguageServiceHandlerServer(ctx, mux, &pb.UnimplementedLanguageServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterLanguageServiceServer(s, &pb.UnimplementedLanguageServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterLanguageServiceHandlerServer(ctx, mux, &pb.UnimplementedLanguageServiceServer{})
+		},
 	)
 }

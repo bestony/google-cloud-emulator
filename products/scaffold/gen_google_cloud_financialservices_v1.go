@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.financialservices.v1.AML",
 		func(s grpc.ServiceRegistrar) { pb.RegisterAMLServer(s, &pb.UnimplementedAMLServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAMLHandlerServer(ctx, mux, &pb.UnimplementedAMLServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAMLHandlerServer(ctx, mux, &pb.UnimplementedAMLServer{})
+		},
 	)
 }

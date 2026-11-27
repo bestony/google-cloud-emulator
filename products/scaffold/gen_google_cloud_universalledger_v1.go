@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.universalledger.v1.UniversalLedger",
-		func(s grpc.ServiceRegistrar) { pb.RegisterUniversalLedgerServer(s, &pb.UnimplementedUniversalLedgerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterUniversalLedgerHandlerServer(ctx, mux, &pb.UnimplementedUniversalLedgerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterUniversalLedgerServer(s, &pb.UnimplementedUniversalLedgerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterUniversalLedgerHandlerServer(ctx, mux, &pb.UnimplementedUniversalLedgerServer{})
+		},
 	)
 }

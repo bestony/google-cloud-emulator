@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.configdelivery.v1.ConfigDelivery",
-		func(s grpc.ServiceRegistrar) { pb.RegisterConfigDeliveryServer(s, &pb.UnimplementedConfigDeliveryServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterConfigDeliveryHandlerServer(ctx, mux, &pb.UnimplementedConfigDeliveryServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterConfigDeliveryServer(s, &pb.UnimplementedConfigDeliveryServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterConfigDeliveryHandlerServer(ctx, mux, &pb.UnimplementedConfigDeliveryServer{})
+		},
 	)
 }

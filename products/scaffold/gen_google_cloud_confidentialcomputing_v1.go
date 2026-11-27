@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.confidentialcomputing.v1.ConfidentialComputing",
-		func(s grpc.ServiceRegistrar) { pb.RegisterConfidentialComputingServer(s, &pb.UnimplementedConfidentialComputingServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterConfidentialComputingHandlerServer(ctx, mux, &pb.UnimplementedConfidentialComputingServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterConfidentialComputingServer(s, &pb.UnimplementedConfidentialComputingServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterConfidentialComputingHandlerServer(ctx, mux, &pb.UnimplementedConfidentialComputingServer{})
+		},
 	)
 }

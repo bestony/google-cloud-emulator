@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.deploy.v1.CloudDeploy",
 		func(s grpc.ServiceRegistrar) { pb.RegisterCloudDeployServer(s, &pb.UnimplementedCloudDeployServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudDeployHandlerServer(ctx, mux, &pb.UnimplementedCloudDeployServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudDeployHandlerServer(ctx, mux, &pb.UnimplementedCloudDeployServer{})
+		},
 	)
 }

@@ -12,11 +12,19 @@ import (
 
 func init() {
 	registerEntry("google.cloud.iap.v1.IdentityAwareProxyAdminService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterIdentityAwareProxyAdminServiceServer(s, &pb.UnimplementedIdentityAwareProxyAdminServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterIdentityAwareProxyAdminServiceHandlerServer(ctx, mux, &pb.UnimplementedIdentityAwareProxyAdminServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterIdentityAwareProxyAdminServiceServer(s, &pb.UnimplementedIdentityAwareProxyAdminServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterIdentityAwareProxyAdminServiceHandlerServer(ctx, mux, &pb.UnimplementedIdentityAwareProxyAdminServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.iap.v1.IdentityAwareProxyOAuthService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterIdentityAwareProxyOAuthServiceServer(s, &pb.UnimplementedIdentityAwareProxyOAuthServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterIdentityAwareProxyOAuthServiceHandlerServer(ctx, mux, &pb.UnimplementedIdentityAwareProxyOAuthServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterIdentityAwareProxyOAuthServiceServer(s, &pb.UnimplementedIdentityAwareProxyOAuthServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterIdentityAwareProxyOAuthServiceHandlerServer(ctx, mux, &pb.UnimplementedIdentityAwareProxyOAuthServiceServer{})
+		},
 	)
 }

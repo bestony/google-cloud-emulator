@@ -13,10 +13,14 @@ import (
 func init() {
 	registerEntry("google.cloud.speech.v1.Speech",
 		func(s grpc.ServiceRegistrar) { pb.RegisterSpeechServer(s, &pb.UnimplementedSpeechServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSpeechHandlerServer(ctx, mux, &pb.UnimplementedSpeechServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSpeechHandlerServer(ctx, mux, &pb.UnimplementedSpeechServer{})
+		},
 	)
 	registerEntry("google.cloud.speech.v1.Adaptation",
 		func(s grpc.ServiceRegistrar) { pb.RegisterAdaptationServer(s, &pb.UnimplementedAdaptationServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAdaptationHandlerServer(ctx, mux, &pb.UnimplementedAdaptationServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAdaptationHandlerServer(ctx, mux, &pb.UnimplementedAdaptationServer{})
+		},
 	)
 }

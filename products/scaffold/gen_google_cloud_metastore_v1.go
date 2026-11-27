@@ -12,11 +12,19 @@ import (
 
 func init() {
 	registerEntry("google.cloud.metastore.v1.DataprocMetastore",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDataprocMetastoreServer(s, &pb.UnimplementedDataprocMetastoreServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataprocMetastoreHandlerServer(ctx, mux, &pb.UnimplementedDataprocMetastoreServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDataprocMetastoreServer(s, &pb.UnimplementedDataprocMetastoreServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataprocMetastoreHandlerServer(ctx, mux, &pb.UnimplementedDataprocMetastoreServer{})
+		},
 	)
 	registerEntry("google.cloud.metastore.v1.DataprocMetastoreFederation",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDataprocMetastoreFederationServer(s, &pb.UnimplementedDataprocMetastoreFederationServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataprocMetastoreFederationHandlerServer(ctx, mux, &pb.UnimplementedDataprocMetastoreFederationServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDataprocMetastoreFederationServer(s, &pb.UnimplementedDataprocMetastoreFederationServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataprocMetastoreFederationHandlerServer(ctx, mux, &pb.UnimplementedDataprocMetastoreFederationServer{})
+		},
 	)
 }

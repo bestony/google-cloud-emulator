@@ -12,11 +12,19 @@ import (
 
 func init() {
 	registerEntry("google.cloud.notebooks.v1.NotebookService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterNotebookServiceServer(s, &pb.UnimplementedNotebookServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterNotebookServiceHandlerServer(ctx, mux, &pb.UnimplementedNotebookServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterNotebookServiceServer(s, &pb.UnimplementedNotebookServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterNotebookServiceHandlerServer(ctx, mux, &pb.UnimplementedNotebookServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.notebooks.v1.ManagedNotebookService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterManagedNotebookServiceServer(s, &pb.UnimplementedManagedNotebookServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterManagedNotebookServiceHandlerServer(ctx, mux, &pb.UnimplementedManagedNotebookServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterManagedNotebookServiceServer(s, &pb.UnimplementedManagedNotebookServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterManagedNotebookServiceHandlerServer(ctx, mux, &pb.UnimplementedManagedNotebookServiceServer{})
+		},
 	)
 }

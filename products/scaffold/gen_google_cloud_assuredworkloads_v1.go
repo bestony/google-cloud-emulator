@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.assuredworkloads.v1.AssuredWorkloadsService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterAssuredWorkloadsServiceServer(s, &pb.UnimplementedAssuredWorkloadsServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAssuredWorkloadsServiceHandlerServer(ctx, mux, &pb.UnimplementedAssuredWorkloadsServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterAssuredWorkloadsServiceServer(s, &pb.UnimplementedAssuredWorkloadsServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAssuredWorkloadsServiceHandlerServer(ctx, mux, &pb.UnimplementedAssuredWorkloadsServiceServer{})
+		},
 	)
 }

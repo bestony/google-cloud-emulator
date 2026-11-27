@@ -13,10 +13,16 @@ import (
 func init() {
 	registerEntry("google.cloud.policysimulator.v1.Simulator",
 		func(s grpc.ServiceRegistrar) { pb.RegisterSimulatorServer(s, &pb.UnimplementedSimulatorServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSimulatorHandlerServer(ctx, mux, &pb.UnimplementedSimulatorServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSimulatorHandlerServer(ctx, mux, &pb.UnimplementedSimulatorServer{})
+		},
 	)
 	registerEntry("google.cloud.policysimulator.v1.OrgPolicyViolationsPreviewService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterOrgPolicyViolationsPreviewServiceServer(s, &pb.UnimplementedOrgPolicyViolationsPreviewServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterOrgPolicyViolationsPreviewServiceHandlerServer(ctx, mux, &pb.UnimplementedOrgPolicyViolationsPreviewServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterOrgPolicyViolationsPreviewServiceServer(s, &pb.UnimplementedOrgPolicyViolationsPreviewServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterOrgPolicyViolationsPreviewServiceHandlerServer(ctx, mux, &pb.UnimplementedOrgPolicyViolationsPreviewServiceServer{})
+		},
 	)
 }

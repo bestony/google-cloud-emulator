@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.clouddms.v1.DataMigrationService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDataMigrationServiceServer(s, &pb.UnimplementedDataMigrationServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataMigrationServiceHandlerServer(ctx, mux, &pb.UnimplementedDataMigrationServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDataMigrationServiceServer(s, &pb.UnimplementedDataMigrationServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataMigrationServiceHandlerServer(ctx, mux, &pb.UnimplementedDataMigrationServiceServer{})
+		},
 	)
 }

@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.datafusion.v1.DataFusion",
 		func(s grpc.ServiceRegistrar) { pb.RegisterDataFusionServer(s, &pb.UnimplementedDataFusionServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataFusionHandlerServer(ctx, mux, &pb.UnimplementedDataFusionServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataFusionHandlerServer(ctx, mux, &pb.UnimplementedDataFusionServer{})
+		},
 	)
 }

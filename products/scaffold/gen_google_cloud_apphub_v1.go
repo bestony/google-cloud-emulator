@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.apphub.v1.AppHub",
 		func(s grpc.ServiceRegistrar) { pb.RegisterAppHubServer(s, &pb.UnimplementedAppHubServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAppHubHandlerServer(ctx, mux, &pb.UnimplementedAppHubServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAppHubHandlerServer(ctx, mux, &pb.UnimplementedAppHubServer{})
+		},
 	)
 }

@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.modelarmor.v1.ModelArmor",
 		func(s grpc.ServiceRegistrar) { pb.RegisterModelArmorServer(s, &pb.UnimplementedModelArmorServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterModelArmorHandlerServer(ctx, mux, &pb.UnimplementedModelArmorServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterModelArmorHandlerServer(ctx, mux, &pb.UnimplementedModelArmorServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.memcache.v1.CloudMemcache",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCloudMemcacheServer(s, &pb.UnimplementedCloudMemcacheServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudMemcacheHandlerServer(ctx, mux, &pb.UnimplementedCloudMemcacheServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCloudMemcacheServer(s, &pb.UnimplementedCloudMemcacheServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudMemcacheHandlerServer(ctx, mux, &pb.UnimplementedCloudMemcacheServer{})
+		},
 	)
 }

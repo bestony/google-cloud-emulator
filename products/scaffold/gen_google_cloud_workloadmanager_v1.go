@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.workloadmanager.v1.WorkloadManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterWorkloadManagerServer(s, &pb.UnimplementedWorkloadManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterWorkloadManagerHandlerServer(ctx, mux, &pb.UnimplementedWorkloadManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterWorkloadManagerServer(s, &pb.UnimplementedWorkloadManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterWorkloadManagerHandlerServer(ctx, mux, &pb.UnimplementedWorkloadManagerServer{})
+		},
 	)
 }

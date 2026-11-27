@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.filestore.v1.CloudFilestoreManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCloudFilestoreManagerServer(s, &pb.UnimplementedCloudFilestoreManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudFilestoreManagerHandlerServer(ctx, mux, &pb.UnimplementedCloudFilestoreManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCloudFilestoreManagerServer(s, &pb.UnimplementedCloudFilestoreManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudFilestoreManagerHandlerServer(ctx, mux, &pb.UnimplementedCloudFilestoreManagerServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.securesourcemanager.v1.SecureSourceManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterSecureSourceManagerServer(s, &pb.UnimplementedSecureSourceManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSecureSourceManagerHandlerServer(ctx, mux, &pb.UnimplementedSecureSourceManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterSecureSourceManagerServer(s, &pb.UnimplementedSecureSourceManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSecureSourceManagerHandlerServer(ctx, mux, &pb.UnimplementedSecureSourceManagerServer{})
+		},
 	)
 }

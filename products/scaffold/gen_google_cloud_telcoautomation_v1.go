@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.telcoautomation.v1.TelcoAutomation",
-		func(s grpc.ServiceRegistrar) { pb.RegisterTelcoAutomationServer(s, &pb.UnimplementedTelcoAutomationServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterTelcoAutomationHandlerServer(ctx, mux, &pb.UnimplementedTelcoAutomationServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterTelcoAutomationServer(s, &pb.UnimplementedTelcoAutomationServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterTelcoAutomationHandlerServer(ctx, mux, &pb.UnimplementedTelcoAutomationServer{})
+		},
 	)
 }

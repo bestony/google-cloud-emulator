@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.ftp.v1.CloudFtp",
 		func(s grpc.ServiceRegistrar) { pb.RegisterCloudFtpServer(s, &pb.UnimplementedCloudFtpServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudFtpHandlerServer(ctx, mux, &pb.UnimplementedCloudFtpServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudFtpHandlerServer(ctx, mux, &pb.UnimplementedCloudFtpServer{})
+		},
 	)
 }

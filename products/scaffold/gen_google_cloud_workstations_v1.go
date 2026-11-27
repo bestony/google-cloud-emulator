@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.workstations.v1.Workstations",
 		func(s grpc.ServiceRegistrar) { pb.RegisterWorkstationsServer(s, &pb.UnimplementedWorkstationsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterWorkstationsHandlerServer(ctx, mux, &pb.UnimplementedWorkstationsServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterWorkstationsHandlerServer(ctx, mux, &pb.UnimplementedWorkstationsServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.parametermanager.v1.ParameterManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterParameterManagerServer(s, &pb.UnimplementedParameterManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterParameterManagerHandlerServer(ctx, mux, &pb.UnimplementedParameterManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterParameterManagerServer(s, &pb.UnimplementedParameterManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterParameterManagerHandlerServer(ctx, mux, &pb.UnimplementedParameterManagerServer{})
+		},
 	)
 }

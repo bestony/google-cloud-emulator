@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.biglake.v1.IcebergCatalogService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterIcebergCatalogServiceServer(s, &pb.UnimplementedIcebergCatalogServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterIcebergCatalogServiceHandlerServer(ctx, mux, &pb.UnimplementedIcebergCatalogServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterIcebergCatalogServiceServer(s, &pb.UnimplementedIcebergCatalogServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterIcebergCatalogServiceHandlerServer(ctx, mux, &pb.UnimplementedIcebergCatalogServiceServer{})
+		},
 	)
 }

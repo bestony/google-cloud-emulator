@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.datastream.v1.Datastream",
 		func(s grpc.ServiceRegistrar) { pb.RegisterDatastreamServer(s, &pb.UnimplementedDatastreamServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDatastreamHandlerServer(ctx, mux, &pb.UnimplementedDatastreamServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDatastreamHandlerServer(ctx, mux, &pb.UnimplementedDatastreamServer{})
+		},
 	)
 }

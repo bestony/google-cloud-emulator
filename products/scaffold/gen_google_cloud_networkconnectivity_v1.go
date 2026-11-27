@@ -12,23 +12,41 @@ import (
 
 func init() {
 	registerEntry("google.cloud.networkconnectivity.v1.PolicyBasedRoutingService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterPolicyBasedRoutingServiceServer(s, &pb.UnimplementedPolicyBasedRoutingServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterPolicyBasedRoutingServiceHandlerServer(ctx, mux, &pb.UnimplementedPolicyBasedRoutingServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterPolicyBasedRoutingServiceServer(s, &pb.UnimplementedPolicyBasedRoutingServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterPolicyBasedRoutingServiceHandlerServer(ctx, mux, &pb.UnimplementedPolicyBasedRoutingServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.networkconnectivity.v1.CrossNetworkAutomationService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCrossNetworkAutomationServiceServer(s, &pb.UnimplementedCrossNetworkAutomationServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCrossNetworkAutomationServiceHandlerServer(ctx, mux, &pb.UnimplementedCrossNetworkAutomationServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCrossNetworkAutomationServiceServer(s, &pb.UnimplementedCrossNetworkAutomationServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCrossNetworkAutomationServiceHandlerServer(ctx, mux, &pb.UnimplementedCrossNetworkAutomationServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.networkconnectivity.v1.DataTransferService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDataTransferServiceServer(s, &pb.UnimplementedDataTransferServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataTransferServiceHandlerServer(ctx, mux, &pb.UnimplementedDataTransferServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDataTransferServiceServer(s, &pb.UnimplementedDataTransferServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataTransferServiceHandlerServer(ctx, mux, &pb.UnimplementedDataTransferServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.networkconnectivity.v1.HubService",
 		func(s grpc.ServiceRegistrar) { pb.RegisterHubServiceServer(s, &pb.UnimplementedHubServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterHubServiceHandlerServer(ctx, mux, &pb.UnimplementedHubServiceServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterHubServiceHandlerServer(ctx, mux, &pb.UnimplementedHubServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.networkconnectivity.v1.InternalRangeService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterInternalRangeServiceServer(s, &pb.UnimplementedInternalRangeServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterInternalRangeServiceHandlerServer(ctx, mux, &pb.UnimplementedInternalRangeServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterInternalRangeServiceServer(s, &pb.UnimplementedInternalRangeServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterInternalRangeServiceHandlerServer(ctx, mux, &pb.UnimplementedInternalRangeServiceServer{})
+		},
 	)
 }

@@ -12,11 +12,17 @@ import (
 
 func init() {
 	registerEntry("google.cloud.managedkafka.v1.ManagedKafkaConnect",
-		func(s grpc.ServiceRegistrar) { pb.RegisterManagedKafkaConnectServer(s, &pb.UnimplementedManagedKafkaConnectServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterManagedKafkaConnectHandlerServer(ctx, mux, &pb.UnimplementedManagedKafkaConnectServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterManagedKafkaConnectServer(s, &pb.UnimplementedManagedKafkaConnectServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterManagedKafkaConnectHandlerServer(ctx, mux, &pb.UnimplementedManagedKafkaConnectServer{})
+		},
 	)
 	registerEntry("google.cloud.managedkafka.v1.ManagedKafka",
 		func(s grpc.ServiceRegistrar) { pb.RegisterManagedKafkaServer(s, &pb.UnimplementedManagedKafkaServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterManagedKafkaHandlerServer(ctx, mux, &pb.UnimplementedManagedKafkaServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterManagedKafkaHandlerServer(ctx, mux, &pb.UnimplementedManagedKafkaServer{})
+		},
 	)
 }

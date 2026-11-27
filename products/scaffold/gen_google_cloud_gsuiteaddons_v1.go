@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.gsuiteaddons.v1.GSuiteAddOns",
 		func(s grpc.ServiceRegistrar) { pb.RegisterGSuiteAddOnsServer(s, &pb.UnimplementedGSuiteAddOnsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGSuiteAddOnsHandlerServer(ctx, mux, &pb.UnimplementedGSuiteAddOnsServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterGSuiteAddOnsHandlerServer(ctx, mux, &pb.UnimplementedGSuiteAddOnsServer{})
+		},
 	)
 }

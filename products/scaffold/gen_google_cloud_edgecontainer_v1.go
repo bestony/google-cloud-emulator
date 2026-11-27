@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.edgecontainer.v1.EdgeContainer",
-		func(s grpc.ServiceRegistrar) { pb.RegisterEdgeContainerServer(s, &pb.UnimplementedEdgeContainerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterEdgeContainerHandlerServer(ctx, mux, &pb.UnimplementedEdgeContainerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterEdgeContainerServer(s, &pb.UnimplementedEdgeContainerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterEdgeContainerHandlerServer(ctx, mux, &pb.UnimplementedEdgeContainerServer{})
+		},
 	)
 }

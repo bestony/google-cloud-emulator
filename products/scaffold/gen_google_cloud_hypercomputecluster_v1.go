@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.hypercomputecluster.v1.HypercomputeCluster",
-		func(s grpc.ServiceRegistrar) { pb.RegisterHypercomputeClusterServer(s, &pb.UnimplementedHypercomputeClusterServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterHypercomputeClusterHandlerServer(ctx, mux, &pb.UnimplementedHypercomputeClusterServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterHypercomputeClusterServer(s, &pb.UnimplementedHypercomputeClusterServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterHypercomputeClusterHandlerServer(ctx, mux, &pb.UnimplementedHypercomputeClusterServer{})
+		},
 	)
 }

@@ -25,6 +25,7 @@ import (
 	"github.com/bestony/google-cloud-emulator/products/pubsub"
 	"github.com/bestony/google-cloud-emulator/products/run"
 	"github.com/bestony/google-cloud-emulator/products/scaffold"
+	"github.com/bestony/google-cloud-emulator/products/sql"
 	"github.com/bestony/google-cloud-emulator/products/secretmanager"
 )
 
@@ -40,6 +41,7 @@ func main() {
 	kmsState := kms.NewState(lroStore)
 	runState := run.NewState(lroStore, iamStore)
 	computeState := compute.NewState()
+	sqlState := sql.NewState()
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
@@ -56,6 +58,9 @@ func main() {
 		fatal(err)
 	}
 	if err := compute.Register(grpcServer, gateway, computeState); err != nil {
+		fatal(err)
+	}
+	if err := sql.Register(grpcServer, gateway, sqlState); err != nil {
 		fatal(err)
 	}
 	// Shared google.longrunning.Operations service for all products.

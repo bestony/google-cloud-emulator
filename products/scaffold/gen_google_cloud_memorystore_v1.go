@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.memorystore.v1.Memorystore",
 		func(s grpc.ServiceRegistrar) { pb.RegisterMemorystoreServer(s, &pb.UnimplementedMemorystoreServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterMemorystoreHandlerServer(ctx, mux, &pb.UnimplementedMemorystoreServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterMemorystoreHandlerServer(ctx, mux, &pb.UnimplementedMemorystoreServer{})
+		},
 	)
 }

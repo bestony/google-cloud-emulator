@@ -12,11 +12,19 @@ import (
 
 func init() {
 	registerEntry("google.cloud.geminidataanalytics.v1.DataChatService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDataChatServiceServer(s, &pb.UnimplementedDataChatServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataChatServiceHandlerServer(ctx, mux, &pb.UnimplementedDataChatServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDataChatServiceServer(s, &pb.UnimplementedDataChatServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataChatServiceHandlerServer(ctx, mux, &pb.UnimplementedDataChatServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.geminidataanalytics.v1.DataAgentService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDataAgentServiceServer(s, &pb.UnimplementedDataAgentServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataAgentServiceHandlerServer(ctx, mux, &pb.UnimplementedDataAgentServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDataAgentServiceServer(s, &pb.UnimplementedDataAgentServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataAgentServiceHandlerServer(ctx, mux, &pb.UnimplementedDataAgentServiceServer{})
+		},
 	)
 }

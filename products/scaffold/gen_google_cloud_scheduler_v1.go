@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.scheduler.v1.CloudScheduler",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCloudSchedulerServer(s, &pb.UnimplementedCloudSchedulerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudSchedulerHandlerServer(ctx, mux, &pb.UnimplementedCloudSchedulerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCloudSchedulerServer(s, &pb.UnimplementedCloudSchedulerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudSchedulerHandlerServer(ctx, mux, &pb.UnimplementedCloudSchedulerServer{})
+		},
 	)
 }

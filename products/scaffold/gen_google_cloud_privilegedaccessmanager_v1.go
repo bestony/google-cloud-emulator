@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.privilegedaccessmanager.v1.PrivilegedAccessManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterPrivilegedAccessManagerServer(s, &pb.UnimplementedPrivilegedAccessManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterPrivilegedAccessManagerHandlerServer(ctx, mux, &pb.UnimplementedPrivilegedAccessManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterPrivilegedAccessManagerServer(s, &pb.UnimplementedPrivilegedAccessManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterPrivilegedAccessManagerHandlerServer(ctx, mux, &pb.UnimplementedPrivilegedAccessManagerServer{})
+		},
 	)
 }

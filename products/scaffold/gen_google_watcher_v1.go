@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.watcher.v1.Watcher",
 		func(s grpc.ServiceRegistrar) { pb.RegisterWatcherServer(s, &pb.UnimplementedWatcherServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterWatcherHandlerServer(ctx, mux, &pb.UnimplementedWatcherServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterWatcherHandlerServer(ctx, mux, &pb.UnimplementedWatcherServer{})
+		},
 	)
 }

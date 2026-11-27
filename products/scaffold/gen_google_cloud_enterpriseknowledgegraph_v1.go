@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.enterpriseknowledgegraph.v1.EnterpriseKnowledgeGraphService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterEnterpriseKnowledgeGraphServiceServer(s, &pb.UnimplementedEnterpriseKnowledgeGraphServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterEnterpriseKnowledgeGraphServiceHandlerServer(ctx, mux, &pb.UnimplementedEnterpriseKnowledgeGraphServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterEnterpriseKnowledgeGraphServiceServer(s, &pb.UnimplementedEnterpriseKnowledgeGraphServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterEnterpriseKnowledgeGraphServiceHandlerServer(ctx, mux, &pb.UnimplementedEnterpriseKnowledgeGraphServiceServer{})
+		},
 	)
 }

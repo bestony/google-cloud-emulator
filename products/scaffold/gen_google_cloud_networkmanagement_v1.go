@@ -12,15 +12,27 @@ import (
 
 func init() {
 	registerEntry("google.cloud.networkmanagement.v1.VpcFlowLogsService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterVpcFlowLogsServiceServer(s, &pb.UnimplementedVpcFlowLogsServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterVpcFlowLogsServiceHandlerServer(ctx, mux, &pb.UnimplementedVpcFlowLogsServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterVpcFlowLogsServiceServer(s, &pb.UnimplementedVpcFlowLogsServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterVpcFlowLogsServiceHandlerServer(ctx, mux, &pb.UnimplementedVpcFlowLogsServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.networkmanagement.v1.OrganizationVpcFlowLogsService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterOrganizationVpcFlowLogsServiceServer(s, &pb.UnimplementedOrganizationVpcFlowLogsServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterOrganizationVpcFlowLogsServiceHandlerServer(ctx, mux, &pb.UnimplementedOrganizationVpcFlowLogsServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterOrganizationVpcFlowLogsServiceServer(s, &pb.UnimplementedOrganizationVpcFlowLogsServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterOrganizationVpcFlowLogsServiceHandlerServer(ctx, mux, &pb.UnimplementedOrganizationVpcFlowLogsServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.networkmanagement.v1.ReachabilityService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterReachabilityServiceServer(s, &pb.UnimplementedReachabilityServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterReachabilityServiceHandlerServer(ctx, mux, &pb.UnimplementedReachabilityServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterReachabilityServiceServer(s, &pb.UnimplementedReachabilityServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterReachabilityServiceHandlerServer(ctx, mux, &pb.UnimplementedReachabilityServiceServer{})
+		},
 	)
 }

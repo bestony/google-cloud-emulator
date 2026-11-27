@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.spanner.v1.Spanner",
 		func(s grpc.ServiceRegistrar) { pb.RegisterSpannerServer(s, &pb.UnimplementedSpannerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSpannerHandlerServer(ctx, mux, &pb.UnimplementedSpannerServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSpannerHandlerServer(ctx, mux, &pb.UnimplementedSpannerServer{})
+		},
 	)
 }

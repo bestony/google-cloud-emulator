@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.licensemanager.v1.LicenseManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterLicenseManagerServer(s, &pb.UnimplementedLicenseManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterLicenseManagerHandlerServer(ctx, mux, &pb.UnimplementedLicenseManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterLicenseManagerServer(s, &pb.UnimplementedLicenseManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterLicenseManagerHandlerServer(ctx, mux, &pb.UnimplementedLicenseManagerServer{})
+		},
 	)
 }

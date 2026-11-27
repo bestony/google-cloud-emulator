@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.iam.v1.IAMPolicy",
 		func(s grpc.ServiceRegistrar) { pb.RegisterIAMPolicyServer(s, &pb.UnimplementedIAMPolicyServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterIAMPolicyHandlerServer(ctx, mux, &pb.UnimplementedIAMPolicyServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterIAMPolicyHandlerServer(ctx, mux, &pb.UnimplementedIAMPolicyServer{})
+		},
 	)
 }

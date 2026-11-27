@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.vmmigration.v1.VmMigration",
 		func(s grpc.ServiceRegistrar) { pb.RegisterVmMigrationServer(s, &pb.UnimplementedVmMigrationServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterVmMigrationHandlerServer(ctx, mux, &pb.UnimplementedVmMigrationServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterVmMigrationHandlerServer(ctx, mux, &pb.UnimplementedVmMigrationServer{})
+		},
 	)
 }

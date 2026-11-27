@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.oslogin.v1.OsLoginService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterOsLoginServiceServer(s, &pb.UnimplementedOsLoginServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterOsLoginServiceHandlerServer(ctx, mux, &pb.UnimplementedOsLoginServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterOsLoginServiceServer(s, &pb.UnimplementedOsLoginServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterOsLoginServiceHandlerServer(ctx, mux, &pb.UnimplementedOsLoginServiceServer{})
+		},
 	)
 }

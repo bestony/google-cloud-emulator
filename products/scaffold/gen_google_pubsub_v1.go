@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.pubsub.v1.SchemaService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterSchemaServiceServer(s, &pb.UnimplementedSchemaServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSchemaServiceHandlerServer(ctx, mux, &pb.UnimplementedSchemaServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterSchemaServiceServer(s, &pb.UnimplementedSchemaServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSchemaServiceHandlerServer(ctx, mux, &pb.UnimplementedSchemaServiceServer{})
+		},
 	)
 }

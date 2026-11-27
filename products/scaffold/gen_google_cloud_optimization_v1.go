@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.optimization.v1.FleetRouting",
 		func(s grpc.ServiceRegistrar) { pb.RegisterFleetRoutingServer(s, &pb.UnimplementedFleetRoutingServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterFleetRoutingHandlerServer(ctx, mux, &pb.UnimplementedFleetRoutingServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterFleetRoutingHandlerServer(ctx, mux, &pb.UnimplementedFleetRoutingServer{})
+		},
 	)
 }

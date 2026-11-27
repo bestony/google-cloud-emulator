@@ -13,10 +13,14 @@ import (
 func init() {
 	registerEntry("google.cloud.billing.v1.CloudCatalog",
 		func(s grpc.ServiceRegistrar) { pb.RegisterCloudCatalogServer(s, &pb.UnimplementedCloudCatalogServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudCatalogHandlerServer(ctx, mux, &pb.UnimplementedCloudCatalogServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudCatalogHandlerServer(ctx, mux, &pb.UnimplementedCloudCatalogServer{})
+		},
 	)
 	registerEntry("google.cloud.billing.v1.CloudBilling",
 		func(s grpc.ServiceRegistrar) { pb.RegisterCloudBillingServer(s, &pb.UnimplementedCloudBillingServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudBillingHandlerServer(ctx, mux, &pb.UnimplementedCloudBillingServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudBillingHandlerServer(ctx, mux, &pb.UnimplementedCloudBillingServer{})
+		},
 	)
 }

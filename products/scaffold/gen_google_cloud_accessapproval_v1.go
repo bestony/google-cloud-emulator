@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.accessapproval.v1.AccessApproval",
-		func(s grpc.ServiceRegistrar) { pb.RegisterAccessApprovalServer(s, &pb.UnimplementedAccessApprovalServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAccessApprovalHandlerServer(ctx, mux, &pb.UnimplementedAccessApprovalServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterAccessApprovalServer(s, &pb.UnimplementedAccessApprovalServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterAccessApprovalHandlerServer(ctx, mux, &pb.UnimplementedAccessApprovalServer{})
+		},
 	)
 }

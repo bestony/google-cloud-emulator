@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.designcenter.v1.DesignCenter",
 		func(s grpc.ServiceRegistrar) { pb.RegisterDesignCenterServer(s, &pb.UnimplementedDesignCenterServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDesignCenterHandlerServer(ctx, mux, &pb.UnimplementedDesignCenterServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDesignCenterHandlerServer(ctx, mux, &pb.UnimplementedDesignCenterServer{})
+		},
 	)
 }

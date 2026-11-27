@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.gkehub.v1.GkeHub",
 		func(s grpc.ServiceRegistrar) { pb.RegisterGkeHubServer(s, &pb.UnimplementedGkeHubServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGkeHubHandlerServer(ctx, mux, &pb.UnimplementedGkeHubServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterGkeHubHandlerServer(ctx, mux, &pb.UnimplementedGkeHubServer{})
+		},
 	)
 }

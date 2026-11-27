@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.orgpolicy.v2.OrgPolicy",
 		func(s grpc.ServiceRegistrar) { pb.RegisterOrgPolicyServer(s, &pb.UnimplementedOrgPolicyServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterOrgPolicyHandlerServer(ctx, mux, &pb.UnimplementedOrgPolicyServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterOrgPolicyHandlerServer(ctx, mux, &pb.UnimplementedOrgPolicyServer{})
+		},
 	)
 }

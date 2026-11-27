@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.websecurityscanner.v1.WebSecurityScanner",
-		func(s grpc.ServiceRegistrar) { pb.RegisterWebSecurityScannerServer(s, &pb.UnimplementedWebSecurityScannerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterWebSecurityScannerHandlerServer(ctx, mux, &pb.UnimplementedWebSecurityScannerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterWebSecurityScannerServer(s, &pb.UnimplementedWebSecurityScannerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterWebSecurityScannerHandlerServer(ctx, mux, &pb.UnimplementedWebSecurityScannerServer{})
+		},
 	)
 }

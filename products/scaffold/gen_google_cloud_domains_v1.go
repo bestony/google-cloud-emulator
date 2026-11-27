@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.domains.v1.Domains",
 		func(s grpc.ServiceRegistrar) { pb.RegisterDomainsServer(s, &pb.UnimplementedDomainsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDomainsHandlerServer(ctx, mux, &pb.UnimplementedDomainsServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDomainsHandlerServer(ctx, mux, &pb.UnimplementedDomainsServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.essentialcontacts.v1.EssentialContactsService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterEssentialContactsServiceServer(s, &pb.UnimplementedEssentialContactsServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterEssentialContactsServiceHandlerServer(ctx, mux, &pb.UnimplementedEssentialContactsServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterEssentialContactsServiceServer(s, &pb.UnimplementedEssentialContactsServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterEssentialContactsServiceHandlerServer(ctx, mux, &pb.UnimplementedEssentialContactsServiceServer{})
+		},
 	)
 }

@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.gkebackup.v1.BackupForGKE",
 		func(s grpc.ServiceRegistrar) { pb.RegisterBackupForGKEServer(s, &pb.UnimplementedBackupForGKEServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterBackupForGKEHandlerServer(ctx, mux, &pb.UnimplementedBackupForGKEServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterBackupForGKEHandlerServer(ctx, mux, &pb.UnimplementedBackupForGKEServer{})
+		},
 	)
 }

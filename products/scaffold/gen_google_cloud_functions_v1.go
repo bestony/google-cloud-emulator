@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.functions.v1.CloudFunctionsService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCloudFunctionsServiceServer(s, &pb.UnimplementedCloudFunctionsServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudFunctionsServiceHandlerServer(ctx, mux, &pb.UnimplementedCloudFunctionsServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCloudFunctionsServiceServer(s, &pb.UnimplementedCloudFunctionsServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudFunctionsServiceHandlerServer(ctx, mux, &pb.UnimplementedCloudFunctionsServiceServer{})
+		},
 	)
 }

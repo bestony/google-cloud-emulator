@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.videointelligence.v1.VideoIntelligenceService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterVideoIntelligenceServiceServer(s, &pb.UnimplementedVideoIntelligenceServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterVideoIntelligenceServiceHandlerServer(ctx, mux, &pb.UnimplementedVideoIntelligenceServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterVideoIntelligenceServiceServer(s, &pb.UnimplementedVideoIntelligenceServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterVideoIntelligenceServiceHandlerServer(ctx, mux, &pb.UnimplementedVideoIntelligenceServiceServer{})
+		},
 	)
 }

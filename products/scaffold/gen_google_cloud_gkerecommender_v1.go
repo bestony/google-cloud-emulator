@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.gkerecommender.v1.GkeInferenceQuickstart",
-		func(s grpc.ServiceRegistrar) { pb.RegisterGkeInferenceQuickstartServer(s, &pb.UnimplementedGkeInferenceQuickstartServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGkeInferenceQuickstartHandlerServer(ctx, mux, &pb.UnimplementedGkeInferenceQuickstartServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterGkeInferenceQuickstartServer(s, &pb.UnimplementedGkeInferenceQuickstartServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterGkeInferenceQuickstartHandlerServer(ctx, mux, &pb.UnimplementedGkeInferenceQuickstartServer{})
+		},
 	)
 }

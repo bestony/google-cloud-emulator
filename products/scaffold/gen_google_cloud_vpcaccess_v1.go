@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.vpcaccess.v1.VpcAccessService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterVpcAccessServiceServer(s, &pb.UnimplementedVpcAccessServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterVpcAccessServiceHandlerServer(ctx, mux, &pb.UnimplementedVpcAccessServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterVpcAccessServiceServer(s, &pb.UnimplementedVpcAccessServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterVpcAccessServiceHandlerServer(ctx, mux, &pb.UnimplementedVpcAccessServiceServer{})
+		},
 	)
 }

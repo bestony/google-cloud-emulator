@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.rapidmigrationassessment.v1.RapidMigrationAssessment",
-		func(s grpc.ServiceRegistrar) { pb.RegisterRapidMigrationAssessmentServer(s, &pb.UnimplementedRapidMigrationAssessmentServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRapidMigrationAssessmentHandlerServer(ctx, mux, &pb.UnimplementedRapidMigrationAssessmentServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterRapidMigrationAssessmentServer(s, &pb.UnimplementedRapidMigrationAssessmentServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterRapidMigrationAssessmentHandlerServer(ctx, mux, &pb.UnimplementedRapidMigrationAssessmentServer{})
+		},
 	)
 }

@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.redis.v1.CloudRedis",
 		func(s grpc.ServiceRegistrar) { pb.RegisterCloudRedisServer(s, &pb.UnimplementedCloudRedisServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudRedisHandlerServer(ctx, mux, &pb.UnimplementedCloudRedisServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudRedisHandlerServer(ctx, mux, &pb.UnimplementedCloudRedisServer{})
+		},
 	)
 }

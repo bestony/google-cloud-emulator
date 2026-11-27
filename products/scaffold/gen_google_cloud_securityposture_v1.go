@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.securityposture.v1.SecurityPosture",
-		func(s grpc.ServiceRegistrar) { pb.RegisterSecurityPostureServer(s, &pb.UnimplementedSecurityPostureServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSecurityPostureHandlerServer(ctx, mux, &pb.UnimplementedSecurityPostureServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterSecurityPostureServer(s, &pb.UnimplementedSecurityPostureServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterSecurityPostureHandlerServer(ctx, mux, &pb.UnimplementedSecurityPostureServer{})
+		},
 	)
 }

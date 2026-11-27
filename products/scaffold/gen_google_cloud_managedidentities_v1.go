@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.managedidentities.v1.ManagedIdentitiesService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterManagedIdentitiesServiceServer(s, &pb.UnimplementedManagedIdentitiesServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterManagedIdentitiesServiceHandlerServer(ctx, mux, &pb.UnimplementedManagedIdentitiesServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterManagedIdentitiesServiceServer(s, &pb.UnimplementedManagedIdentitiesServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterManagedIdentitiesServiceHandlerServer(ctx, mux, &pb.UnimplementedManagedIdentitiesServiceServer{})
+		},
 	)
 }

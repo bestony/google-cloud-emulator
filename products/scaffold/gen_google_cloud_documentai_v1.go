@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.documentai.v1.DocumentProcessorService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDocumentProcessorServiceServer(s, &pb.UnimplementedDocumentProcessorServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDocumentProcessorServiceHandlerServer(ctx, mux, &pb.UnimplementedDocumentProcessorServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterDocumentProcessorServiceServer(s, &pb.UnimplementedDocumentProcessorServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDocumentProcessorServiceHandlerServer(ctx, mux, &pb.UnimplementedDocumentProcessorServiceServer{})
+		},
 	)
 }

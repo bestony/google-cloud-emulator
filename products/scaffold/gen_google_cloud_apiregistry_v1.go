@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.apiregistry.v1.CloudApiRegistry",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCloudApiRegistryServer(s, &pb.UnimplementedCloudApiRegistryServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudApiRegistryHandlerServer(ctx, mux, &pb.UnimplementedCloudApiRegistryServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCloudApiRegistryServer(s, &pb.UnimplementedCloudApiRegistryServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudApiRegistryHandlerServer(ctx, mux, &pb.UnimplementedCloudApiRegistryServer{})
+		},
 	)
 }

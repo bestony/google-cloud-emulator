@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.dataform.v1.Dataform",
 		func(s grpc.ServiceRegistrar) { pb.RegisterDataformServer(s, &pb.UnimplementedDataformServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDataformHandlerServer(ctx, mux, &pb.UnimplementedDataformServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterDataformHandlerServer(ctx, mux, &pb.UnimplementedDataformServer{})
+		},
 	)
 }

@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.observability.v1.Observability",
-		func(s grpc.ServiceRegistrar) { pb.RegisterObservabilityServer(s, &pb.UnimplementedObservabilityServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterObservabilityHandlerServer(ctx, mux, &pb.UnimplementedObservabilityServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterObservabilityServer(s, &pb.UnimplementedObservabilityServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterObservabilityHandlerServer(ctx, mux, &pb.UnimplementedObservabilityServer{})
+		},
 	)
 }

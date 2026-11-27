@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.batch.v1.BatchService",
 		func(s grpc.ServiceRegistrar) { pb.RegisterBatchServiceServer(s, &pb.UnimplementedBatchServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterBatchServiceHandlerServer(ctx, mux, &pb.UnimplementedBatchServiceServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterBatchServiceHandlerServer(ctx, mux, &pb.UnimplementedBatchServiceServer{})
+		},
 	)
 }

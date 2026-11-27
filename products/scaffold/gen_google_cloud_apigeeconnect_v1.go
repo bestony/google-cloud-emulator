@@ -12,8 +12,12 @@ import (
 
 func init() {
 	registerEntry("google.cloud.apigeeconnect.v1.ConnectionService",
-		func(s grpc.ServiceRegistrar) { pb.RegisterConnectionServiceServer(s, &pb.UnimplementedConnectionServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterConnectionServiceHandlerServer(ctx, mux, &pb.UnimplementedConnectionServiceServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterConnectionServiceServer(s, &pb.UnimplementedConnectionServiceServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterConnectionServiceHandlerServer(ctx, mux, &pb.UnimplementedConnectionServiceServer{})
+		},
 	)
 	registerEntry("google.cloud.apigeeconnect.v1.Tether",
 		func(s grpc.ServiceRegistrar) { pb.RegisterTetherServer(s, &pb.UnimplementedTetherServer{}) },

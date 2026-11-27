@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.vmwareengine.v1.VmwareEngine",
 		func(s grpc.ServiceRegistrar) { pb.RegisterVmwareEngineServer(s, &pb.UnimplementedVmwareEngineServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterVmwareEngineHandlerServer(ctx, mux, &pb.UnimplementedVmwareEngineServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterVmwareEngineHandlerServer(ctx, mux, &pb.UnimplementedVmwareEngineServer{})
+		},
 	)
 }

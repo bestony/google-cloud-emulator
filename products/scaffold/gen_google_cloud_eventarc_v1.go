@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.eventarc.v1.Eventarc",
 		func(s grpc.ServiceRegistrar) { pb.RegisterEventarcServer(s, &pb.UnimplementedEventarcServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterEventarcHandlerServer(ctx, mux, &pb.UnimplementedEventarcServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterEventarcHandlerServer(ctx, mux, &pb.UnimplementedEventarcServer{})
+		},
 	)
 }

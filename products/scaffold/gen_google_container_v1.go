@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.container.v1.ClusterManager",
-		func(s grpc.ServiceRegistrar) { pb.RegisterClusterManagerServer(s, &pb.UnimplementedClusterManagerServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterClusterManagerHandlerServer(ctx, mux, &pb.UnimplementedClusterManagerServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterClusterManagerServer(s, &pb.UnimplementedClusterManagerServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterClusterManagerHandlerServer(ctx, mux, &pb.UnimplementedClusterManagerServer{})
+		},
 	)
 }

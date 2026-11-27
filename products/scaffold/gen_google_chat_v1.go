@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.chat.v1.ChatService",
 		func(s grpc.ServiceRegistrar) { pb.RegisterChatServiceServer(s, &pb.UnimplementedChatServiceServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterChatServiceHandlerServer(ctx, mux, &pb.UnimplementedChatServiceServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterChatServiceHandlerServer(ctx, mux, &pb.UnimplementedChatServiceServer{})
+		},
 	)
 }

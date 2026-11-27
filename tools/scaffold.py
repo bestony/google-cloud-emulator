@@ -44,6 +44,12 @@ EXCLUDE = {
     "google.cloud.compute.v1.GlobalOperations",
     "google.cloud.compute.v1.ZoneOperations",
     "google.cloud.compute.v1.RegionOperations",
+    # Hand-written products/sql.
+    "google.cloud.sql.v1.SqlInstancesService",
+    "google.cloud.sql.v1.SqlOperationsService",
+    "google.cloud.sql.v1.SqlUsersService",
+    "google.cloud.sql.v1.SqlDatabasesService",
+    "google.cloud.sql.v1.SqlBackupRunsService",
 }
 
 REGISTER_RE = re.compile(r"^func (Register\w+Server)\(", re.M)

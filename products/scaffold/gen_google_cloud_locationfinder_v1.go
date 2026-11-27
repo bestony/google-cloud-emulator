@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.locationfinder.v1.CloudLocationFinder",
-		func(s grpc.ServiceRegistrar) { pb.RegisterCloudLocationFinderServer(s, &pb.UnimplementedCloudLocationFinderServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterCloudLocationFinderHandlerServer(ctx, mux, &pb.UnimplementedCloudLocationFinderServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterCloudLocationFinderServer(s, &pb.UnimplementedCloudLocationFinderServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterCloudLocationFinderHandlerServer(ctx, mux, &pb.UnimplementedCloudLocationFinderServer{})
+		},
 	)
 }

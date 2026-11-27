@@ -13,6 +13,8 @@ import (
 func init() {
 	registerEntry("google.cloud.netapp.v1.NetApp",
 		func(s grpc.ServiceRegistrar) { pb.RegisterNetAppServer(s, &pb.UnimplementedNetAppServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterNetAppHandlerServer(ctx, mux, &pb.UnimplementedNetAppServer{}) },
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterNetAppHandlerServer(ctx, mux, &pb.UnimplementedNetAppServer{})
+		},
 	)
 }

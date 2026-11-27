@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.blockchainnodeengine.v1.BlockchainNodeEngine",
-		func(s grpc.ServiceRegistrar) { pb.RegisterBlockchainNodeEngineServer(s, &pb.UnimplementedBlockchainNodeEngineServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterBlockchainNodeEngineHandlerServer(ctx, mux, &pb.UnimplementedBlockchainNodeEngineServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterBlockchainNodeEngineServer(s, &pb.UnimplementedBlockchainNodeEngineServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterBlockchainNodeEngineHandlerServer(ctx, mux, &pb.UnimplementedBlockchainNodeEngineServer{})
+		},
 	)
 }

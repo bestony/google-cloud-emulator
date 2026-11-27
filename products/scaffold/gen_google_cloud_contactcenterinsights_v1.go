@@ -12,7 +12,11 @@ import (
 
 func init() {
 	registerEntry("google.cloud.contactcenterinsights.v1.ContactCenterInsights",
-		func(s grpc.ServiceRegistrar) { pb.RegisterContactCenterInsightsServer(s, &pb.UnimplementedContactCenterInsightsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterContactCenterInsightsHandlerServer(ctx, mux, &pb.UnimplementedContactCenterInsightsServer{}) },
+		func(s grpc.ServiceRegistrar) {
+			pb.RegisterContactCenterInsightsServer(s, &pb.UnimplementedContactCenterInsightsServer{})
+		},
+		func(ctx context.Context, mux *runtime.ServeMux) error {
+			return pb.RegisterContactCenterInsightsHandlerServer(ctx, mux, &pb.UnimplementedContactCenterInsightsServer{})
+		},
 	)
 }
