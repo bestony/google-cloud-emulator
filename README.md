@@ -2,9 +2,9 @@
 
 A local emulator for Google Cloud APIs, written in Go. Inspired by [aws/aws-emulator](https://github.com/aws/aws-emulator): API shapes are driven by the official [googleapis](https://github.com/googleapis/googleapis) protobuf models, and handwritten code only implements state and business rules.
 
-## Status: M3
+## Status: M4
 
-Control-plane CRUD for eight hand-written products, plus **every other stable v1 Google Cloud API surface reachable** via auto-generated scaffolds. Pure in-memory state.
+Control-plane CRUD for ten hand-written products, plus **every other stable v1 Google Cloud API surface reachable** via auto-generated scaffolds. Pure in-memory state.
 
 | Product | Protocol | Coverage |
 |---|---|---|
@@ -16,12 +16,14 @@ Control-plane CRUD for eight hand-written products, plus **every other stable v1
 | Compute Engine (`compute.googleapis.com`) | gRPC + REST (grpc-gateway) | Instances, disks, networks, subnetworks, firewalls, addresses, images, snapshots, instance templates, health checks CRUD; zonal/regional/global operations get/list; aggregated lists; machine types/zones/regions return honest empty reference data. ~114 other compute services stay UNIMPLEMENTED. |
 | Cloud SQL (`sqladmin.googleapis.com`) | gRPC + REST (grpc-gateway) | Instances CRUD (state RUNNABLE, ETag, self links), users/databases/backup runs subresources, operations get/list. Operations complete instantly as DONE. Flags/SSL certs/import-export stay UNIMPLEMENTED. |
 | GKE (`container.googleapis.com`) | gRPC + REST (grpc-gateway) | ClusterManager clusters CRUD + update (desired master version, monitoring, addons, …) + operations get/list. Node pools, server config, JSON web keys and IP rotation stay UNIMPLEMENTED. |
+| IAM Policy (`iam.googleapis.com`) | gRPC + REST (grpc-gateway) | `google.iam.v1.IAMPolicy` `GetIamPolicy`/`SetIamPolicy`/`TestIamPermissions` over the shared policy store, so policies are visible both here and via each product's own IAM verbs (resource names accept the `//host/` prefix form). Binding conditions and audit configs return UNIMPLEMENTED. |
+| Cloud Storage (`storage.googleapis.com`) | REST (JSON API, no protobuf surface) | `/storage/v1/b` buckets: insert/get/patch/update/delete/list with project scoping, prefix + pagination, RFC 7386 merge-patch, server-managed fields (kind/selfLink/etag/metageneration/timeCreated), bucket name validation, and bucket IAM get/set/test. Object data plane (`/o/...`, uploads) returns UNIMPLEMENTED. |
 
 Core framework: single h2c port serving gRPC and REST, host/path routing, accept-any Bearer auth, `google.rpc.Code` → REST error envelope, pagination tokens, IAM policy store.
 
 ### Bulk coverage (scaffold)
 
-`tools/vendor.py` pulls the dependency closure of every stable `v1` service proto from [googleapis/googleapis](https://github.com/googleapis/googleapis) into `protos/`, `tools/generate.py` regenerates `gen/` per directory, and `tools/scaffold.py` emits `products/scaffold/`: one registration per generated gRPC service (442 services across 144 packages) that embeds the generated `Unimplemented*Server`, so gRPC returns `UNIMPLEMENTED` and REST returns 501 with the standard error envelope. The scaffold registers FIRST and the hand-written products after: grpc-gateway resolves duplicate REST patterns in favor of the last registration, so hand-written products win path conflicts. One known conflict: GKE and AlloyDB both use `/v1/projects/*/locations/*/clusters/*` (real GCP separates them by host); the emulator is single-host, so that path serves GKE. Two protos (`google/api/httpbody.proto`, `google/rpc/status.proto`) intentionally use the genproto Go packages to avoid proto-registration conflicts with grpc-gateway's runtime.
+`tools/vendor.py` pulls the dependency closure of every stable `v1` service proto from [googleapis/googleapis](https://github.com/googleapis/googleapis) into `protos/`, `tools/generate.py` regenerates `gen/` per directory, and `tools/scaffold.py` emits `products/scaffold/`: one registration per generated gRPC service (441 services across 143 packages) that embeds the generated `Unimplemented*Server`, so gRPC returns `UNIMPLEMENTED` and REST returns 501 with the standard error envelope. The scaffold registers FIRST and the hand-written products after: grpc-gateway resolves duplicate REST patterns in favor of the last registration, so hand-written products win path conflicts. One known conflict: GKE and AlloyDB both use `/v1/projects/*/locations/*/clusters/*` (real GCP separates them by host); the emulator is single-host, so that path serves GKE. Two protos (`google/api/httpbody.proto`, `google/rpc/status.proto`) intentionally use the genproto Go packages to avoid proto-registration conflicts with grpc-gateway's runtime.
 
 ## Run
 
@@ -30,8 +32,8 @@ go build -o gcpex ./cmd/gcpex
 ./gcpex -addr :8080   # or GCPEX_ADDR=:8080
 ```
 
-- REST: `http://localhost:8080/v1/projects/{p}/secrets` (Secret Manager), `http://localhost:8080/dns/v1/projects/{p}/managedZones` (Cloud DNS), `http://localhost:8080/v1/{parent=projects/*/topics/*}` (Pub/Sub), `http://localhost:8080/v1/{parent=projects/*/locations/*}/keyRings` (KMS), `http://localhost:8080/v2/{parent=projects/*/locations/*}/services` (Cloud Run)
-- gRPC: plaintext h2c on the same port (Secret Manager, Pub/Sub, KMS, Cloud Run Services and the shared `google.longrunning.Operations` service)
+- REST: `http://localhost:8080/v1/projects/{p}/secrets` (Secret Manager), `http://localhost:8080/dns/v1/projects/{p}/managedZones` (Cloud DNS), `http://localhost:8080/v1/{parent=projects/*/topics/*}` (Pub/Sub), `http://localhost:8080/v1/{parent=projects/*/locations/*}/keyRings` (KMS), `http://localhost:8080/v2/{parent=projects/*/locations/*}/services` (Cloud Run), `http://localhost:8080/v1/{resource=**}:getIamPolicy` (IAM Policy), `http://localhost:8080/storage/v1/b?project={p}` (Cloud Storage buckets)
+- gRPC: plaintext h2c on the same port (Secret Manager, Pub/Sub, KMS, Cloud Run Services, Compute, Cloud SQL, GKE, IAM Policy and the shared `google.longrunning.Operations` service)
 - `GET /healthz` → `ok`
 
 Authentication accepts any Bearer token; the caller identity defaults to `dev@localhost`.
@@ -77,4 +79,5 @@ go build ./... && go test ./...
 - M1 (done): Pub/Sub, Cloud KMS, Cloud Run v2 control planes
 - M2 (done): bulk vendor + scaffold — all stable v1 control-plane surfaces reachable, UNIMPLEMENTED until hand-written
 - M3 (done): Tier-1 hand-written control planes — Compute Engine, Cloud SQL, GKE
-- M4: data planes (GCS objects, Pub/Sub messages, Firestore, Datastore, …) and more Tier-1 hand implementations
+- M4 (done): more Tier-1 — IAM Policy API, Cloud Storage bucket control plane
+- M5: data planes (GCS objects, Pub/Sub messages, Firestore, Datastore, …) and further Tier-1 hand implementations
