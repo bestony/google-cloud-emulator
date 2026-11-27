@@ -21,6 +21,7 @@ import (
 	longrunningpb "github.com/bestony/google-cloud-emulator/gen/google/longrunning"
 	"github.com/bestony/google-cloud-emulator/products/compute"
 	"github.com/bestony/google-cloud-emulator/products/dns"
+	"github.com/bestony/google-cloud-emulator/products/gcs"
 	"github.com/bestony/google-cloud-emulator/products/gke"
 	iamapi "github.com/bestony/google-cloud-emulator/products/iam"
 	"github.com/bestony/google-cloud-emulator/products/kms"
@@ -39,6 +40,7 @@ func main() {
 	lroStore := lro.NewStore()
 	smState := secretmanager.NewState(iamStore)
 	dnsState := dns.NewState(iamStore)
+	gcsState := gcs.NewState(iamStore)
 	pubsubState := pubsub.NewState()
 	kmsState := kms.NewState(lroStore)
 	runState := run.NewState(lroStore, iamStore)
@@ -95,6 +97,7 @@ func main() {
 		_, _ = w.Write([]byte("ok"))
 	})
 	mux.Handle("/dns/v1/", dns.NewHandler(dnsState))
+	mux.Handle("/storage/v1/", gcs.NewHandler(gcsState))
 	mux.Handle("/", gke.WrapGateway(gateway))
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
