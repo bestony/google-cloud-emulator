@@ -43,14 +43,15 @@ func TestRegisterAllGRPCUnimplemented(t *testing.T) {
 	}
 	defer conn.Close()
 
-	client := compute.NewInstancesClient(conn)
-	_, err = client.Get(context.Background(), &compute.GetInstanceRequest{
-		Project:  "test-project",
-		Zone:     "us-central1-a",
-		Instance: "vm-1",
+	// Instances is hand-written and excluded from the scaffold; use
+	// MachineImages, which is still scaffolded.
+	client := compute.NewMachineImagesClient(conn)
+	_, err = client.Get(context.Background(), &compute.GetMachineImageRequest{
+		Project:      "test-project",
+		MachineImage: "mi-1",
 	})
 	if status.Code(err) != codes.Unimplemented {
-		t.Fatalf("GetInstance: got %v, want Unimplemented", err)
+		t.Fatalf("GetMachineImage: got %v, want Unimplemented", err)
 	}
 }
 
@@ -60,7 +61,7 @@ func TestRegisterAllRESTUnimplemented(t *testing.T) {
 	// Compute Engine's REST endpoint for an unimplemented method must return
 	// an honest 501 rather than a fabricated resource.
 	req := httptest.NewRequest(http.MethodGet,
-		"https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i", nil)
+		"https://compute.googleapis.com/compute/v1/projects/p/global/machineImages/i", nil)
 	rec := httptest.NewRecorder()
 	gateway.ServeHTTP(rec, req)
 	if rec.Code != http.StatusNotImplemented {
@@ -68,6 +69,6 @@ func TestRegisterAllRESTUnimplemented(t *testing.T) {
 		if len(body) > 200 {
 			body = body[:200]
 		}
-		t.Fatalf("REST GetInstance: got status %d, want 501; body: %s", rec.Code, body)
+		t.Fatalf("REST GetMachineImage: got status %d, want 501; body: %s", rec.Code, body)
 	}
 }

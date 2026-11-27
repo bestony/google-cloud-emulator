@@ -21,12 +21,13 @@ import (
 	longrunningpb "github.com/bestony/google-cloud-emulator/gen/google/longrunning"
 	"github.com/bestony/google-cloud-emulator/products/compute"
 	"github.com/bestony/google-cloud-emulator/products/dns"
+	"github.com/bestony/google-cloud-emulator/products/gke"
 	"github.com/bestony/google-cloud-emulator/products/kms"
 	"github.com/bestony/google-cloud-emulator/products/pubsub"
 	"github.com/bestony/google-cloud-emulator/products/run"
 	"github.com/bestony/google-cloud-emulator/products/scaffold"
-	"github.com/bestony/google-cloud-emulator/products/sql"
 	"github.com/bestony/google-cloud-emulator/products/secretmanager"
+	"github.com/bestony/google-cloud-emulator/products/sql"
 )
 
 func main() {
@@ -42,9 +43,19 @@ func main() {
 	runState := run.NewState(lroStore, iamStore)
 	computeState := compute.NewState()
 	sqlState := sql.NewState()
+	gkeState := gke.NewState()
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
+	// Every generated service starts as an honest UNIMPLEMENTED stub.
+	// Registered FIRST: grpc-gateway resolves duplicate REST patterns in
+	// favor of the LAST registration, so the hand-written products below
+	// win any path conflicts (e.g. GKE and AlloyDB share
+	// /v1/projects/*/locations/*/clusters/*, which real GCP separates by
+	// host; the emulator is single-host).
+	if err := scaffold.RegisterAll(grpcServer, gateway); err != nil {
+		fmt.Fprintf(os.Stderr, "gcpex: scaffold gateway conflicts: %v\n", err)
+	}
 	if err := secretmanager.Register(grpcServer, gateway, smState); err != nil {
 		fatal(err)
 	}
@@ -63,16 +74,14 @@ func main() {
 	if err := sql.Register(grpcServer, gateway, sqlState); err != nil {
 		fatal(err)
 	}
+	if err := gke.Register(grpcServer, gateway, gkeState); err != nil {
+		fatal(err)
+	}
 	// Shared google.longrunning.Operations service for all products.
 	opsServer := lro.NewServer(lroStore)
 	longrunningpb.RegisterOperationsServer(grpcServer, opsServer)
 	if err := longrunningpb.RegisterOperationsHandlerServer(context.Background(), gateway, opsServer); err != nil {
 		fatal(err)
-	}
-	// Every other generated service: reachable, honestly UNIMPLEMENTED.
-	// Registered last so hand-written products win any route conflicts.
-	if err := scaffold.RegisterAll(grpcServer, gateway); err != nil {
-		fmt.Fprintf(os.Stderr, "gcpex: scaffold gateway conflicts: %v\n", err)
 	}
 
 	mux := http.NewServeMux()
@@ -81,7 +90,7 @@ func main() {
 		_, _ = w.Write([]byte("ok"))
 	})
 	mux.Handle("/dns/v1/", dns.NewHandler(dnsState))
-	mux.Handle("/", gateway)
+	mux.Handle("/", gke.WrapGateway(gateway))
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isGRPC(r) {
