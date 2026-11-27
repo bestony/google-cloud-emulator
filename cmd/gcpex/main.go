@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net"
@@ -16,7 +17,10 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/bestony/google-cloud-emulator/core/iam"
+	"github.com/bestony/google-cloud-emulator/core/lro"
+	longrunningpb "github.com/bestony/google-cloud-emulator/gen/google/longrunning"
 	"github.com/bestony/google-cloud-emulator/products/dns"
+	"github.com/bestony/google-cloud-emulator/products/kms"
 	"github.com/bestony/google-cloud-emulator/products/pubsub"
 	"github.com/bestony/google-cloud-emulator/products/secretmanager"
 )
@@ -26,9 +30,11 @@ func main() {
 	flag.Parse()
 
 	iamStore := iam.NewStore()
+	lroStore := lro.NewStore()
 	smState := secretmanager.NewState(iamStore)
 	dnsState := dns.NewState(iamStore)
 	pubsubState := pubsub.NewState()
+	kmsState := kms.NewState(lroStore)
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
@@ -36,6 +42,15 @@ func main() {
 		fatal(err)
 	}
 	if err := pubsub.Register(grpcServer, gateway, pubsubState); err != nil {
+		fatal(err)
+	}
+	if err := kms.Register(grpcServer, gateway, kmsState); err != nil {
+		fatal(err)
+	}
+	// Shared google.longrunning.Operations service for all products.
+	opsServer := lro.NewServer(lroStore)
+	longrunningpb.RegisterOperationsServer(grpcServer, opsServer)
+	if err := longrunningpb.RegisterOperationsHandlerServer(context.Background(), gateway, opsServer); err != nil {
 		fatal(err)
 	}
 
