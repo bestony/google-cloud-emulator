@@ -15,10 +15,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterAcceleratorTypesServer(s, &pb.UnimplementedAcceleratorTypesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAcceleratorTypesHandlerServer(ctx, mux, &pb.UnimplementedAcceleratorTypesServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.Addresses",
-		func(s grpc.ServiceRegistrar) { pb.RegisterAddressesServer(s, &pb.UnimplementedAddressesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAddressesHandlerServer(ctx, mux, &pb.UnimplementedAddressesServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.Advice",
 		func(s grpc.ServiceRegistrar) { pb.RegisterAdviceServer(s, &pb.UnimplementedAdviceServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterAdviceHandlerServer(ctx, mux, &pb.UnimplementedAdviceServer{}) },
@@ -43,10 +39,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterDiskTypesServer(s, &pb.UnimplementedDiskTypesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDiskTypesHandlerServer(ctx, mux, &pb.UnimplementedDiskTypesServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.Disks",
-		func(s grpc.ServiceRegistrar) { pb.RegisterDisksServer(s, &pb.UnimplementedDisksServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterDisksHandlerServer(ctx, mux, &pb.UnimplementedDisksServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.ExternalVpnGateways",
 		func(s grpc.ServiceRegistrar) { pb.RegisterExternalVpnGatewaysServer(s, &pb.UnimplementedExternalVpnGatewaysServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterExternalVpnGatewaysHandlerServer(ctx, mux, &pb.UnimplementedExternalVpnGatewaysServer{}) },
@@ -54,10 +46,6 @@ func init() {
 	registerEntry("google.cloud.compute.v1.FirewallPolicies",
 		func(s grpc.ServiceRegistrar) { pb.RegisterFirewallPoliciesServer(s, &pb.UnimplementedFirewallPoliciesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterFirewallPoliciesHandlerServer(ctx, mux, &pb.UnimplementedFirewallPoliciesServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Firewalls",
-		func(s grpc.ServiceRegistrar) { pb.RegisterFirewallsServer(s, &pb.UnimplementedFirewallsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterFirewallsHandlerServer(ctx, mux, &pb.UnimplementedFirewallsServer{}) },
 	)
 	registerEntry("google.cloud.compute.v1.ForwardingRules",
 		func(s grpc.ServiceRegistrar) { pb.RegisterForwardingRulesServer(s, &pb.UnimplementedForwardingRulesServer{}) },
@@ -83,10 +71,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterGlobalNetworkEndpointGroupsServer(s, &pb.UnimplementedGlobalNetworkEndpointGroupsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGlobalNetworkEndpointGroupsHandlerServer(ctx, mux, &pb.UnimplementedGlobalNetworkEndpointGroupsServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.GlobalOperations",
-		func(s grpc.ServiceRegistrar) { pb.RegisterGlobalOperationsServer(s, &pb.UnimplementedGlobalOperationsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGlobalOperationsHandlerServer(ctx, mux, &pb.UnimplementedGlobalOperationsServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.GlobalOrganizationOperations",
 		func(s grpc.ServiceRegistrar) { pb.RegisterGlobalOrganizationOperationsServer(s, &pb.UnimplementedGlobalOrganizationOperationsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGlobalOrganizationOperationsHandlerServer(ctx, mux, &pb.UnimplementedGlobalOrganizationOperationsServer{}) },
@@ -99,10 +83,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterGlobalVmExtensionPoliciesServer(s, &pb.UnimplementedGlobalVmExtensionPoliciesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterGlobalVmExtensionPoliciesHandlerServer(ctx, mux, &pb.UnimplementedGlobalVmExtensionPoliciesServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.HealthChecks",
-		func(s grpc.ServiceRegistrar) { pb.RegisterHealthChecksServer(s, &pb.UnimplementedHealthChecksServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterHealthChecksHandlerServer(ctx, mux, &pb.UnimplementedHealthChecksServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.Hosts",
 		func(s grpc.ServiceRegistrar) { pb.RegisterHostsServer(s, &pb.UnimplementedHostsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterHostsHandlerServer(ctx, mux, &pb.UnimplementedHostsServer{}) },
@@ -114,10 +94,6 @@ func init() {
 	registerEntry("google.cloud.compute.v1.ImageViews",
 		func(s grpc.ServiceRegistrar) { pb.RegisterImageViewsServer(s, &pb.UnimplementedImageViewsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterImageViewsHandlerServer(ctx, mux, &pb.UnimplementedImageViewsServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Images",
-		func(s grpc.ServiceRegistrar) { pb.RegisterImagesServer(s, &pb.UnimplementedImagesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterImagesHandlerServer(ctx, mux, &pb.UnimplementedImagesServer{}) },
 	)
 	registerEntry("google.cloud.compute.v1.InstanceGroupManagerResizeRequests",
 		func(s grpc.ServiceRegistrar) { pb.RegisterInstanceGroupManagerResizeRequestsServer(s, &pb.UnimplementedInstanceGroupManagerResizeRequestsServer{}) },
@@ -134,14 +110,6 @@ func init() {
 	registerEntry("google.cloud.compute.v1.InstanceSettingsService",
 		func(s grpc.ServiceRegistrar) { pb.RegisterInstanceSettingsServiceServer(s, &pb.UnimplementedInstanceSettingsServiceServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterInstanceSettingsServiceHandlerServer(ctx, mux, &pb.UnimplementedInstanceSettingsServiceServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.InstanceTemplates",
-		func(s grpc.ServiceRegistrar) { pb.RegisterInstanceTemplatesServer(s, &pb.UnimplementedInstanceTemplatesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterInstanceTemplatesHandlerServer(ctx, mux, &pb.UnimplementedInstanceTemplatesServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Instances",
-		func(s grpc.ServiceRegistrar) { pb.RegisterInstancesServer(s, &pb.UnimplementedInstancesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterInstancesHandlerServer(ctx, mux, &pb.UnimplementedInstancesServer{}) },
 	)
 	registerEntry("google.cloud.compute.v1.InstantSnapshotGroups",
 		func(s grpc.ServiceRegistrar) { pb.RegisterInstantSnapshotGroupsServer(s, &pb.UnimplementedInstantSnapshotGroupsServer{}) },
@@ -187,10 +155,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterMachineImagesServer(s, &pb.UnimplementedMachineImagesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterMachineImagesHandlerServer(ctx, mux, &pb.UnimplementedMachineImagesServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.MachineTypes",
-		func(s grpc.ServiceRegistrar) { pb.RegisterMachineTypesServer(s, &pb.UnimplementedMachineTypesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterMachineTypesHandlerServer(ctx, mux, &pb.UnimplementedMachineTypesServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.ManagedRulesets",
 		func(s grpc.ServiceRegistrar) { pb.RegisterManagedRulesetsServer(s, &pb.UnimplementedManagedRulesetsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterManagedRulesetsHandlerServer(ctx, mux, &pb.UnimplementedManagedRulesetsServer{}) },
@@ -214,10 +178,6 @@ func init() {
 	registerEntry("google.cloud.compute.v1.NetworkProfiles",
 		func(s grpc.ServiceRegistrar) { pb.RegisterNetworkProfilesServer(s, &pb.UnimplementedNetworkProfilesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterNetworkProfilesHandlerServer(ctx, mux, &pb.UnimplementedNetworkProfilesServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Networks",
-		func(s grpc.ServiceRegistrar) { pb.RegisterNetworksServer(s, &pb.UnimplementedNetworksServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterNetworksHandlerServer(ctx, mux, &pb.UnimplementedNetworksServer{}) },
 	)
 	registerEntry("google.cloud.compute.v1.NodeGroups",
 		func(s grpc.ServiceRegistrar) { pb.RegisterNodeGroupsServer(s, &pb.UnimplementedNodeGroupsServer{}) },
@@ -343,10 +303,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterRegionNotificationEndpointsServer(s, &pb.UnimplementedRegionNotificationEndpointsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRegionNotificationEndpointsHandlerServer(ctx, mux, &pb.UnimplementedRegionNotificationEndpointsServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.RegionOperations",
-		func(s grpc.ServiceRegistrar) { pb.RegisterRegionOperationsServer(s, &pb.UnimplementedRegionOperationsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRegionOperationsHandlerServer(ctx, mux, &pb.UnimplementedRegionOperationsServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.RegionSecurityPolicies",
 		func(s grpc.ServiceRegistrar) { pb.RegisterRegionSecurityPoliciesServer(s, &pb.UnimplementedRegionSecurityPoliciesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRegionSecurityPoliciesHandlerServer(ctx, mux, &pb.UnimplementedRegionSecurityPoliciesServer{}) },
@@ -386,10 +342,6 @@ func init() {
 	registerEntry("google.cloud.compute.v1.RegionZones",
 		func(s grpc.ServiceRegistrar) { pb.RegisterRegionZonesServer(s, &pb.UnimplementedRegionZonesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRegionZonesHandlerServer(ctx, mux, &pb.UnimplementedRegionZonesServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Regions",
-		func(s grpc.ServiceRegistrar) { pb.RegisterRegionsServer(s, &pb.UnimplementedRegionsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterRegionsHandlerServer(ctx, mux, &pb.UnimplementedRegionsServer{}) },
 	)
 	registerEntry("google.cloud.compute.v1.ReliabilityRisks",
 		func(s grpc.ServiceRegistrar) { pb.RegisterReliabilityRisksServer(s, &pb.UnimplementedReliabilityRisksServer{}) },
@@ -443,10 +395,6 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterSnapshotSettingsServiceServer(s, &pb.UnimplementedSnapshotSettingsServiceServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSnapshotSettingsServiceHandlerServer(ctx, mux, &pb.UnimplementedSnapshotSettingsServiceServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.Snapshots",
-		func(s grpc.ServiceRegistrar) { pb.RegisterSnapshotsServer(s, &pb.UnimplementedSnapshotsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSnapshotsHandlerServer(ctx, mux, &pb.UnimplementedSnapshotsServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.SslCertificates",
 		func(s grpc.ServiceRegistrar) { pb.RegisterSslCertificatesServer(s, &pb.UnimplementedSslCertificatesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSslCertificatesHandlerServer(ctx, mux, &pb.UnimplementedSslCertificatesServer{}) },
@@ -462,10 +410,6 @@ func init() {
 	registerEntry("google.cloud.compute.v1.StoragePools",
 		func(s grpc.ServiceRegistrar) { pb.RegisterStoragePoolsServer(s, &pb.UnimplementedStoragePoolsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterStoragePoolsHandlerServer(ctx, mux, &pb.UnimplementedStoragePoolsServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Subnetworks",
-		func(s grpc.ServiceRegistrar) { pb.RegisterSubnetworksServer(s, &pb.UnimplementedSubnetworksServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterSubnetworksHandlerServer(ctx, mux, &pb.UnimplementedSubnetworksServer{}) },
 	)
 	registerEntry("google.cloud.compute.v1.TargetGrpcProxies",
 		func(s grpc.ServiceRegistrar) { pb.RegisterTargetGrpcProxiesServer(s, &pb.UnimplementedTargetGrpcProxiesServer{}) },
@@ -515,16 +459,8 @@ func init() {
 		func(s grpc.ServiceRegistrar) { pb.RegisterWireGroupsServer(s, &pb.UnimplementedWireGroupsServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterWireGroupsHandlerServer(ctx, mux, &pb.UnimplementedWireGroupsServer{}) },
 	)
-	registerEntry("google.cloud.compute.v1.ZoneOperations",
-		func(s grpc.ServiceRegistrar) { pb.RegisterZoneOperationsServer(s, &pb.UnimplementedZoneOperationsServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterZoneOperationsHandlerServer(ctx, mux, &pb.UnimplementedZoneOperationsServer{}) },
-	)
 	registerEntry("google.cloud.compute.v1.ZoneVmExtensionPolicies",
 		func(s grpc.ServiceRegistrar) { pb.RegisterZoneVmExtensionPoliciesServer(s, &pb.UnimplementedZoneVmExtensionPoliciesServer{}) },
 		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterZoneVmExtensionPoliciesHandlerServer(ctx, mux, &pb.UnimplementedZoneVmExtensionPoliciesServer{}) },
-	)
-	registerEntry("google.cloud.compute.v1.Zones",
-		func(s grpc.ServiceRegistrar) { pb.RegisterZonesServer(s, &pb.UnimplementedZonesServer{}) },
-		func(ctx context.Context, mux *runtime.ServeMux) error { return pb.RegisterZonesHandlerServer(ctx, mux, &pb.UnimplementedZonesServer{}) },
 	)
 }

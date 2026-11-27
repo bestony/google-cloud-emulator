@@ -27,6 +27,23 @@ EXCLUDE = {
     "google.cloud.kms.v1.KeyManagementService",
     "google.cloud.run.v2.Services",
     "google.longrunning.Operations",
+    # Hand-written products/compute.
+    "google.cloud.compute.v1.Instances",
+    "google.cloud.compute.v1.Disks",
+    "google.cloud.compute.v1.Networks",
+    "google.cloud.compute.v1.Subnetworks",
+    "google.cloud.compute.v1.Firewalls",
+    "google.cloud.compute.v1.Addresses",
+    "google.cloud.compute.v1.MachineTypes",
+    "google.cloud.compute.v1.Zones",
+    "google.cloud.compute.v1.Regions",
+    "google.cloud.compute.v1.Images",
+    "google.cloud.compute.v1.Snapshots",
+    "google.cloud.compute.v1.InstanceTemplates",
+    "google.cloud.compute.v1.HealthChecks",
+    "google.cloud.compute.v1.GlobalOperations",
+    "google.cloud.compute.v1.ZoneOperations",
+    "google.cloud.compute.v1.RegionOperations",
 }
 
 REGISTER_RE = re.compile(r"^func (Register\w+Server)\(", re.M)

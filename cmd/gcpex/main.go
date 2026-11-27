@@ -19,6 +19,7 @@ import (
 	"github.com/bestony/google-cloud-emulator/core/iam"
 	"github.com/bestony/google-cloud-emulator/core/lro"
 	longrunningpb "github.com/bestony/google-cloud-emulator/gen/google/longrunning"
+	"github.com/bestony/google-cloud-emulator/products/compute"
 	"github.com/bestony/google-cloud-emulator/products/dns"
 	"github.com/bestony/google-cloud-emulator/products/kms"
 	"github.com/bestony/google-cloud-emulator/products/pubsub"
@@ -38,6 +39,7 @@ func main() {
 	pubsubState := pubsub.NewState()
 	kmsState := kms.NewState(lroStore)
 	runState := run.NewState(lroStore, iamStore)
+	computeState := compute.NewState()
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
@@ -51,6 +53,9 @@ func main() {
 		fatal(err)
 	}
 	if err := run.Register(grpcServer, gateway, runState); err != nil {
+		fatal(err)
+	}
+	if err := compute.Register(grpcServer, gateway, computeState); err != nil {
 		fatal(err)
 	}
 	// Shared google.longrunning.Operations service for all products.
