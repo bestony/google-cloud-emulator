@@ -22,6 +22,7 @@ import (
 	"github.com/bestony/google-cloud-emulator/products/compute"
 	"github.com/bestony/google-cloud-emulator/products/dns"
 	"github.com/bestony/google-cloud-emulator/products/gke"
+	iamapi "github.com/bestony/google-cloud-emulator/products/iam"
 	"github.com/bestony/google-cloud-emulator/products/kms"
 	"github.com/bestony/google-cloud-emulator/products/pubsub"
 	"github.com/bestony/google-cloud-emulator/products/run"
@@ -44,6 +45,7 @@ func main() {
 	computeState := compute.NewState()
 	sqlState := sql.NewState()
 	gkeState := gke.NewState()
+	iamState := iamapi.NewState(iamStore)
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
@@ -75,6 +77,9 @@ func main() {
 		fatal(err)
 	}
 	if err := gke.Register(grpcServer, gateway, gkeState); err != nil {
+		fatal(err)
+	}
+	if err := iamapi.Register(grpcServer, gateway, iamState); err != nil {
 		fatal(err)
 	}
 	// Shared google.longrunning.Operations service for all products.

@@ -52,6 +52,8 @@ EXCLUDE = {
     "google.cloud.sql.v1.SqlBackupRunsService",
     # Hand-written products/gke.
     "google.container.v1.ClusterManager",
+    # Hand-written products/iam.
+    "google.iam.v1.IAMPolicy",
 }
 
 REGISTER_RE = re.compile(r"^func (Register\w+Server)\(", re.M)
