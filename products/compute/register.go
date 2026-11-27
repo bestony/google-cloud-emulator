@@ -10,8 +10,8 @@ import (
 )
 
 // Register wires the implemented Compute Engine services into the gRPC
-// server and REST gateway. All other compute services remain scaffolded
-// UNIMPLEMENTED.
+// server and REST gateway. Core resources use hand-written behavior; the
+// remaining control-plane services use the stateful generic implementation.
 func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) error {
 	ctx := context.Background()
 
@@ -97,5 +97,5 @@ func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) 
 	if err := computepb.RegisterRegionOperationsHandlerServer(ctx, gateway, regionOps); err != nil {
 		return err
 	}
-	return nil
+	return registerGenericComputeServices(grpcServer, gateway, state)
 }

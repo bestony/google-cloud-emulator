@@ -12,6 +12,7 @@ import (
 	"time"
 
 	computepb "github.com/bestony/google-cloud-emulator/gen/google/cloud/compute/v1"
+	"google.golang.org/protobuf/proto"
 )
 
 const selfLinkBase = "https://www.googleapis.com/compute/v1"
@@ -31,23 +32,26 @@ type State struct {
 	healthChecks map[string]*computepb.HealthCheck
 	operations   map[string]*computepb.Operation
 
+	genericResources map[string]proto.Message
+
 	nextOperationID uint64
 	nextResourceID  uint64
 }
 
 func NewState() *State {
 	return &State{
-		instances:    map[string]*computepb.Instance{},
-		disks:        map[string]*computepb.Disk{},
-		networks:     map[string]*computepb.Network{},
-		subnetworks:  map[string]*computepb.Subnetwork{},
-		firewalls:    map[string]*computepb.Firewall{},
-		addresses:    map[string]*computepb.Address{},
-		images:       map[string]*computepb.Image{},
-		snapshots:    map[string]*computepb.Snapshot{},
-		instanceTpls: map[string]*computepb.InstanceTemplate{},
-		healthChecks: map[string]*computepb.HealthCheck{},
-		operations:   map[string]*computepb.Operation{},
+		instances:        map[string]*computepb.Instance{},
+		disks:            map[string]*computepb.Disk{},
+		networks:         map[string]*computepb.Network{},
+		subnetworks:      map[string]*computepb.Subnetwork{},
+		firewalls:        map[string]*computepb.Firewall{},
+		addresses:        map[string]*computepb.Address{},
+		images:           map[string]*computepb.Image{},
+		snapshots:        map[string]*computepb.Snapshot{},
+		instanceTpls:     map[string]*computepb.InstanceTemplate{},
+		healthChecks:     map[string]*computepb.HealthCheck{},
+		operations:       map[string]*computepb.Operation{},
+		genericResources: map[string]proto.Message{},
 	}
 }
 

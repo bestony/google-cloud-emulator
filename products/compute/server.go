@@ -259,9 +259,9 @@ func (s *instancesServer) AggregatedList(_ context.Context, req *computepb.Aggre
 	}
 	sort.Strings(keys)
 	out := &computepb.InstanceAggregatedList{
-		Id:     protoString("compute.instances.aggregatedList"),
-		Kind:   protoString("compute#instanceAggregatedList"),
-		Items:  map[string]*computepb.InstancesScopedList{},
+		Id:    protoString("compute.instances.aggregatedList"),
+		Kind:  protoString("compute#instanceAggregatedList"),
+		Items: map[string]*computepb.InstancesScopedList{},
 		SelfLink: protoString(fmt.Sprintf("%s/projects/%s/aggregated/instances",
 			selfLinkBase, req.Project)),
 	}
@@ -393,8 +393,8 @@ func (s *disksServer) AggregatedList(_ context.Context, req *computepb.Aggregate
 	}
 	sort.Strings(keys)
 	out := &computepb.DiskAggregatedList{
-		Id:   protoString("compute.disks.aggregatedList"),
-		Kind: protoString("compute#diskAggregatedList"),
+		Id:    protoString("compute.disks.aggregatedList"),
+		Kind:  protoString("compute#diskAggregatedList"),
 		Items: map[string]*computepb.DisksScopedList{},
 		SelfLink: protoString(fmt.Sprintf("%s/projects/%s/aggregated/disks",
 			selfLinkBase, req.Project)),
@@ -688,8 +688,8 @@ func (s *subnetworksServer) AggregatedList(_ context.Context, req *computepb.Agg
 	}
 	sort.Strings(keys)
 	out := &computepb.SubnetworkAggregatedList{
-		Id:   protoString("compute.subnetworks.aggregatedList"),
-		Kind: protoString("compute#subnetworkAggregatedList"),
+		Id:    protoString("compute.subnetworks.aggregatedList"),
+		Kind:  protoString("compute#subnetworkAggregatedList"),
 		Items: map[string]*computepb.SubnetworksScopedList{},
 		SelfLink: protoString(fmt.Sprintf("%s/projects/%s/aggregated/subnetworks",
 			selfLinkBase, req.Project)),
@@ -955,8 +955,8 @@ func (s *addressesServer) AggregatedList(_ context.Context, req *computepb.Aggre
 	}
 	sort.Strings(keys)
 	out := &computepb.AddressAggregatedList{
-		Id:   protoString("compute.addresses.aggregatedList"),
-		Kind: protoString("compute#addressAggregatedList"),
+		Id:    protoString("compute.addresses.aggregatedList"),
+		Kind:  protoString("compute#addressAggregatedList"),
 		Items: map[string]*computepb.AddressesScopedList{},
 		SelfLink: protoString(fmt.Sprintf("%s/projects/%s/aggregated/addresses",
 			selfLinkBase, req.Project)),
@@ -1313,8 +1313,8 @@ func (s *instanceTemplatesServer) AggregatedList(_ context.Context, req *compute
 	}
 	sort.Strings(keys)
 	out := &computepb.InstanceTemplateAggregatedList{
-		Id:   protoString("compute.instanceTemplates.aggregatedList"),
-		Kind: protoString("compute#instanceTemplateAggregatedList"),
+		Id:    protoString("compute.instanceTemplates.aggregatedList"),
+		Kind:  protoString("compute#instanceTemplateAggregatedList"),
 		Items: map[string]*computepb.InstanceTemplatesScopedList{},
 		SelfLink: protoString(fmt.Sprintf("%s/projects/%s/aggregated/instanceTemplates",
 			selfLinkBase, req.Project)),
@@ -1501,8 +1501,8 @@ func (s *healthChecksServer) AggregatedList(_ context.Context, req *computepb.Ag
 	}
 	sort.Strings(keys)
 	out := &computepb.HealthChecksAggregatedList{
-		Id:   protoString("compute.healthChecks.aggregatedList"),
-		Kind: protoString("compute#healthCheckAggregatedList"),
+		Id:    protoString("compute.healthChecks.aggregatedList"),
+		Kind:  protoString("compute#healthCheckAggregatedList"),
 		Items: map[string]*computepb.HealthChecksScopedList{},
 		SelfLink: protoString(fmt.Sprintf("%s/projects/%s/aggregated/healthChecks",
 			selfLinkBase, req.Project)),

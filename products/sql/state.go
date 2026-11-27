@@ -20,22 +20,28 @@ type State struct {
 	mu sync.RWMutex
 
 	// Instances are keyed project|name (names are unique per project).
-	instances  map[string]*sqlpb.DatabaseInstance
-	users      map[string]*sqlpb.User
-	databases  map[string]*sqlpb.Database
-	backupRuns map[string]*sqlpb.BackupRun
-	operations map[string]*sqlpb.Operation
+	instances            map[string]*sqlpb.DatabaseInstance
+	users                map[string]*sqlpb.User
+	databases            map[string]*sqlpb.Database
+	backupRuns           map[string]*sqlpb.BackupRun
+	operations           map[string]*sqlpb.Operation
+	sslCerts             map[string]*sqlpb.SslCert
+	serverCaCerts        map[string]*sqlpb.SslCert
+	customerCertificates map[string]*sqlpb.CustomerManagedCertificateConfig
 
 	nextID uint64
 }
 
 func NewState() *State {
 	return &State{
-		instances:  map[string]*sqlpb.DatabaseInstance{},
-		users:      map[string]*sqlpb.User{},
-		databases:  map[string]*sqlpb.Database{},
-		backupRuns: map[string]*sqlpb.BackupRun{},
-		operations: map[string]*sqlpb.Operation{},
+		instances:            map[string]*sqlpb.DatabaseInstance{},
+		users:                map[string]*sqlpb.User{},
+		databases:            map[string]*sqlpb.Database{},
+		backupRuns:           map[string]*sqlpb.BackupRun{},
+		operations:           map[string]*sqlpb.Operation{},
+		sslCerts:             map[string]*sqlpb.SslCert{},
+		serverCaCerts:        map[string]*sqlpb.SslCert{},
+		customerCertificates: map[string]*sqlpb.CustomerManagedCertificateConfig{},
 	}
 }
 
@@ -57,6 +63,18 @@ func databaseKey(project, instance, name string) string {
 
 func backupRunKey(project, instance string, id int64) string {
 	return fmt.Sprintf("%s|%s|%d", project, instance, id)
+}
+
+func sslCertKey(project, instance, fingerprint string) string {
+	return strings.Join([]string{project, instance, fingerprint}, "|")
+}
+
+func sslInstanceKey(project, instance string) string {
+	return project + "|" + instance
+}
+
+func customerCertificateKey(project, instance, bundle string) string {
+	return strings.Join([]string{project, instance, bundle}, "|")
 }
 
 func instanceSelfLink(project, name string) string {

@@ -21,6 +21,7 @@ func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) 
 	databases := &databasesServer{state: state}
 	backupRuns := &backupRunsServer{state: state}
 	flags := &flagsServer{}
+	sslCerts := &sslCertsServer{state: state}
 
 	sqlpb.RegisterSqlInstancesServiceServer(grpcServer, instances)
 	sqlpb.RegisterSqlOperationsServiceServer(grpcServer, operations)
@@ -28,6 +29,7 @@ func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) 
 	sqlpb.RegisterSqlDatabasesServiceServer(grpcServer, databases)
 	sqlpb.RegisterSqlBackupRunsServiceServer(grpcServer, backupRuns)
 	sqlpb.RegisterSqlFlagsServiceServer(grpcServer, flags)
+	sqlpb.RegisterSqlSslCertsServiceServer(grpcServer, sslCerts)
 
 	if err := sqlpb.RegisterSqlInstancesServiceHandlerServer(ctx, gateway, instances); err != nil {
 		return err
@@ -45,6 +47,9 @@ func Register(grpcServer *grpc.Server, gateway *runtime.ServeMux, state *State) 
 		return err
 	}
 	if err := sqlpb.RegisterSqlFlagsServiceHandlerServer(ctx, gateway, flags); err != nil {
+		return err
+	}
+	if err := sqlpb.RegisterSqlSslCertsServiceHandlerServer(ctx, gateway, sslCerts); err != nil {
 		return err
 	}
 	return nil

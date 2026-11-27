@@ -386,3 +386,77 @@ func TestRESTGateway(t *testing.T) {
 		t.Fatalf("delete status = %d body=%s", resp6.StatusCode, raw)
 	}
 }
+
+func TestSslCertificatesAndAdvancedInstanceOperations(t *testing.T) {
+	ctx := context.Background()
+	st := NewState()
+	instances := &instancesServer{state: st}
+	if _, err := instances.Insert(ctx, &sqlpb.SqlInstancesInsertRequest{Project: project, Body: &sqlpb.DatabaseInstance{Name: "ssl-db"}}); err != nil {
+		t.Fatalf("insert instance: %v", err)
+	}
+
+	certs := &sslCertsServer{state: st}
+	ins, err := certs.Insert(ctx, &sqlpb.SqlSslCertsInsertRequest{
+		Project: project, Instance: "ssl-db",
+		Body: &sqlpb.SslCertsInsertRequest{CommonName: "client-1"},
+	})
+	if err != nil {
+		t.Fatalf("insert ssl cert: %v", err)
+	}
+	cert := ins.GetClientCert().GetCertInfo()
+	if cert.GetCert() == "" || ins.GetClientCert().GetCertPrivateKey() == "" || ins.GetServerCaCert().GetCert() == "" {
+		t.Fatalf("incomplete cert response: %+v", ins)
+	}
+	got, err := certs.Get(ctx, &sqlpb.SqlSslCertsGetRequest{Project: project, Instance: "ssl-db", Sha1Fingerprint: cert.GetSha1Fingerprint()})
+	if err != nil || got.GetCommonName() != "client-1" {
+		t.Fatalf("get ssl cert: %v %+v", err, got)
+	}
+	list, err := certs.List(ctx, &sqlpb.SqlSslCertsListRequest{Project: project, Instance: "ssl-db"})
+	if err != nil || len(list.GetItems()) != 1 {
+		t.Fatalf("list ssl certs: %v %+v", err, list)
+	}
+	eph, err := instances.CreateEphemeral(ctx, &sqlpb.SqlInstancesCreateEphemeralCertRequest{Project: project, Instance: "ssl-db", Body: &sqlpb.SslCertsCreateEphemeralRequest{PublicKey: "unused"}})
+	if err != nil || eph.GetCert() == "" {
+		t.Fatalf("create ephemeral cert: %v %+v", err, eph)
+	}
+	if _, err := instances.ResetSslConfig(ctx, &sqlpb.SqlInstancesResetSslConfigRequest{Project: project, Instance: "ssl-db"}); err != nil {
+		t.Fatalf("reset ssl config: %v", err)
+	}
+	list, err = certs.List(ctx, &sqlpb.SqlSslCertsListRequest{Project: project, Instance: "ssl-db"})
+	if err != nil || len(list.GetItems()) != 0 {
+		t.Fatalf("ssl certs after reset: %v %+v", err, list)
+	}
+
+	if _, err := instances.Stop(ctx, &sqlpb.SqlInstancesStopRequest{Project: project, Instance: "ssl-db"}); err != nil {
+		t.Fatalf("stop instance: %v", err)
+	}
+	inst, _ := instances.Get(ctx, &sqlpb.SqlInstancesGetRequest{Project: project, Instance: "ssl-db"})
+	if inst.GetState() != sqlpb.DatabaseInstance_SUSPENDED {
+		t.Fatalf("state after stop: %v", inst.GetState())
+	}
+	if _, err := instances.Start(ctx, &sqlpb.SqlInstancesStartRequest{Project: project, Instance: "ssl-db"}); err != nil {
+		t.Fatalf("start instance: %v", err)
+	}
+	if _, err := instances.Restart(ctx, &sqlpb.SqlInstancesRestartRequest{Project: project, Instance: "ssl-db"}); err != nil {
+		t.Fatalf("restart instance: %v", err)
+	}
+	if _, err := instances.Clone(ctx, &sqlpb.SqlInstancesCloneRequest{Project: project, Instance: "ssl-db", Body: &sqlpb.InstancesCloneRequest{CloneContext: &sqlpb.CloneContext{DestinationInstanceName: "ssl-db-clone"}}}); err != nil {
+		t.Fatalf("clone instance: %v", err)
+	}
+	clone, err := instances.Get(ctx, &sqlpb.SqlInstancesGetRequest{Project: project, Instance: "ssl-db-clone"})
+	if err != nil || clone.GetName() != "ssl-db-clone" {
+		t.Fatalf("get clone: %v %+v", err, clone)
+	}
+
+	customerCfg := &sqlpb.CustomerManagedCertificateConfig{}
+	if _, err := certs.UpdateCustomerManagedCertificate(ctx, &sqlpb.UpdateCustomerManagedCertificateRequest{Project: project, Instance: "ssl-db", CertificateBundle: "bundle1", AllowMissing: true, CustomerManagedCertificateConfig: customerCfg}); err != nil {
+		t.Fatalf("update customer certificate: %v", err)
+	}
+	customerList, err := certs.ListCustomerManagedCertificates(ctx, &sqlpb.ListCustomerManagedCertificatesRequest{Project: project, Instance: "ssl-db"})
+	if err != nil || len(customerList.GetCustomerManagedCertificates()) != 1 {
+		t.Fatalf("list customer certificates: %v %+v", err, customerList)
+	}
+	if _, err := certs.DeleteCustomerManagedCertificate(ctx, &sqlpb.DeleteCustomerManagedCertificateRequest{Project: project, Instance: "ssl-db", CertificateBundle: "bundle1"}); err != nil {
+		t.Fatalf("delete customer certificate: %v", err)
+	}
+}

@@ -7,6 +7,7 @@ package scaffold
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -20,6 +21,34 @@ type entry struct {
 
 var entries []entry
 var seen = make(map[string]bool)
+
+// SuppressPrefix removes scaffold registrations whose fully-qualified service
+// name starts with prefix. Hand-written product packages use this during init
+// when they implement an entire generated API surface themselves.
+func SuppressPrefix(prefix string) {
+	kept := entries[:0]
+	for _, e := range entries {
+		if !strings.HasPrefix(e.name, prefix) {
+			kept = append(kept, e)
+		}
+	}
+	entries = kept
+}
+
+// SuppressServices removes exact fully-qualified service registrations.
+func SuppressServices(names ...string) {
+	suppressed := map[string]bool{}
+	for _, name := range names {
+		suppressed[name] = true
+	}
+	kept := entries[:0]
+	for _, e := range entries {
+		if !suppressed[e.name] {
+			kept = append(kept, e)
+		}
+	}
+	entries = kept
+}
 
 func registerEntry(name string, grpcReg func(grpc.ServiceRegistrar), gwReg func(context.Context, *runtime.ServeMux) error) {
 	if name != "" {

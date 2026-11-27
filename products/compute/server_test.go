@@ -26,11 +26,11 @@ const (
 	region  = "us-central1"
 )
 
-func newInstances(s *State) *instancesServer   { return &instancesServer{state: s} }
-func newDisks(s *State) *disksServer           { return &disksServer{state: s} }
-func newNetworks(s *State) *networksServer     { return &networksServer{state: s} }
-func newFirewall(s *State) *firewallsServer    { return &firewallsServer{state: s} }
-func newImages(s *State) *imagesServer         { return &imagesServer{state: s} }
+func newInstances(s *State) *instancesServer    { return &instancesServer{state: s} }
+func newDisks(s *State) *disksServer            { return &disksServer{state: s} }
+func newNetworks(s *State) *networksServer      { return &networksServer{state: s} }
+func newFirewall(s *State) *firewallsServer     { return &firewallsServer{state: s} }
+func newImages(s *State) *imagesServer          { return &imagesServer{state: s} }
 func newZoneOps(s *State) *zoneOperationsServer { return &zoneOperationsServer{state: s} }
 func newGlobalOps(s *State) *globalOperationsServer {
 	return &globalOperationsServer{state: s}
@@ -45,9 +45,9 @@ func TestInstanceLifecycle(t *testing.T) {
 		Project: project,
 		Zone:    "zones/" + zone,
 		InstanceResource: &computepb.Instance{
-			Name:         protoString("web-1"),
-			MachineType:  protoString("zones/" + zone + "/machineTypes/n1-standard-1"),
-			Labels:       map[string]string{"env": "test"},
+			Name:        protoString("web-1"),
+			MachineType: protoString("zones/" + zone + "/machineTypes/n1-standard-1"),
+			Labels:      map[string]string{"env": "test"},
 		},
 	})
 	if err != nil {
@@ -147,8 +147,8 @@ func TestNetworkFirewallAddress(t *testing.T) {
 	nw, fw, ad := newNetworks(st), newFirewall(st), &addressesServer{state: st}
 
 	if _, err := nw.Insert(ctx, &computepb.InsertNetworkRequest{
-		Project:          project,
-		NetworkResource:  &computepb.Network{Name: protoString("default")},
+		Project:         project,
+		NetworkResource: &computepb.Network{Name: protoString("default")},
 	}); err != nil {
 		t.Fatalf("InsertNetwork: %v", err)
 	}
@@ -158,9 +158,9 @@ func TestNetworkFirewallAddress(t *testing.T) {
 	}
 	// Patch changes description, keeps id/selfLink.
 	if _, err := nw.Patch(ctx, &computepb.PatchNetworkRequest{
-		Project:           project,
-		Network:           "default",
-		NetworkResource:   &computepb.Network{Description: protoString("patched")},
+		Project:         project,
+		Network:         "default",
+		NetworkResource: &computepb.Network{Description: protoString("patched")},
 	}); err != nil {
 		t.Fatalf("PatchNetwork: %v", err)
 	}
@@ -216,9 +216,9 @@ func TestDiskSubnetworkImageSnapshotTemplateHealthCheck(t *testing.T) {
 	// Disk lifecycle.
 	d := &disksServer{state: st}
 	op, err := d.Insert(ctx, &computepb.InsertDiskRequest{
-		Project:         project,
-		Zone:            zone,
-		DiskResource:    &computepb.Disk{Name: protoString("data-1"), SizeGb: protoInt64(10)},
+		Project:      project,
+		Zone:         zone,
+		DiskResource: &computepb.Disk{Name: protoString("data-1"), SizeGb: protoInt64(10)},
 	})
 	if err != nil || op.GetStatus() != computepb.Operation_DONE {
 		t.Fatalf("InsertDisk: %v %+v", err, op)
@@ -245,8 +245,8 @@ func TestDiskSubnetworkImageSnapshotTemplateHealthCheck(t *testing.T) {
 	// Image + GetFromFamily.
 	img := &imagesServer{state: st}
 	if _, err := img.Insert(ctx, &computepb.InsertImageRequest{
-		Project:         project,
-		ImageResource:   &computepb.Image{Name: protoString("img-1"), Family: protoString("debian-12")},
+		Project:       project,
+		ImageResource: &computepb.Image{Name: protoString("img-1"), Family: protoString("debian-12")},
 	}); err != nil {
 		t.Fatalf("InsertImage: %v", err)
 	}
@@ -261,8 +261,8 @@ func TestDiskSubnetworkImageSnapshotTemplateHealthCheck(t *testing.T) {
 	// Snapshot.
 	snap := &snapshotsServer{state: st}
 	if _, err := snap.Insert(ctx, &computepb.InsertSnapshotRequest{
-		Project:           project,
-		SnapshotResource:  &computepb.Snapshot{Name: protoString("snap-1"), SourceDisk: protoString(disk.GetSelfLink())},
+		Project:          project,
+		SnapshotResource: &computepb.Snapshot{Name: protoString("snap-1"), SourceDisk: protoString(disk.GetSelfLink())},
 	}); err != nil {
 		t.Fatalf("InsertSnapshot: %v", err)
 	}
@@ -274,7 +274,7 @@ func TestDiskSubnetworkImageSnapshotTemplateHealthCheck(t *testing.T) {
 	// Instance template (global).
 	tpl := &instanceTemplatesServer{state: st}
 	if _, err := tpl.Insert(ctx, &computepb.InsertInstanceTemplateRequest{
-		Project:                 project,
+		Project:                  project,
 		InstanceTemplateResource: &computepb.InstanceTemplate{Name: protoString("tpl-1")},
 	}); err != nil {
 		t.Fatalf("InsertInstanceTemplate: %v", err)
@@ -349,9 +349,30 @@ func TestGRPCTransport(t *testing.T) {
 	if err != nil || got.GetName() != "grpc-1" {
 		t.Fatalf("gRPC GetInstance: %v %+v", err, got)
 	}
-	// Unimplemented compute method stays UNIMPLEMENTED.
-	if _, err := computepb.NewMachineImagesClient(conn).Get(context.Background(), &computepb.GetMachineImageRequest{Project: project, MachineImage: "x"}); status.Code(err) != codes.Unimplemented {
-		t.Fatalf("MachineImages.GetMachineImage: got %v, want Unimplemented", err)
+	// Long-tail compute services use the generic stateful control plane.
+	machineImages := computepb.NewMachineImagesClient(conn)
+	if _, err := machineImages.Get(context.Background(), &computepb.GetMachineImageRequest{Project: project, MachineImage: "x"}); status.Code(err) != codes.NotFound {
+		t.Fatalf("MachineImages.GetMachineImage before insert: got %v, want NotFound", err)
+	}
+	if _, err := machineImages.Insert(context.Background(), &computepb.InsertMachineImageRequest{
+		Project:              project,
+		MachineImageResource: &computepb.MachineImage{Name: protoString("mi-1")},
+	}); err != nil {
+		t.Fatalf("MachineImages.Insert: %v", err)
+	}
+	mi, err := machineImages.Get(context.Background(), &computepb.GetMachineImageRequest{Project: project, MachineImage: "mi-1"})
+	if err != nil || mi.GetName() != "mi-1" || mi.GetSelfLink() == "" {
+		t.Fatalf("MachineImages.Get: %v %+v", err, mi)
+	}
+	list, err := machineImages.List(context.Background(), &computepb.ListMachineImagesRequest{Project: project})
+	if err != nil || len(list.Items) != 1 || list.Items[0].GetName() != "mi-1" {
+		t.Fatalf("MachineImages.List: %v %+v", err, list)
+	}
+	if _, err := machineImages.Delete(context.Background(), &computepb.DeleteMachineImageRequest{Project: project, MachineImage: "mi-1"}); err != nil {
+		t.Fatalf("MachineImages.Delete: %v", err)
+	}
+	if _, err := machineImages.Get(context.Background(), &computepb.GetMachineImageRequest{Project: project, MachineImage: "mi-1"}); status.Code(err) != codes.NotFound {
+		t.Fatalf("MachineImages.Get after delete: got %v, want NotFound", err)
 	}
 }
 
@@ -423,5 +444,31 @@ func TestRESTGateway(t *testing.T) {
 	}
 	if nl["kind"] != "compute#networkList" {
 		t.Fatalf("unexpected network list: %v", nl)
+	}
+
+	// A long-tail resource is served through the same generated REST gateway.
+	miBody := `{"name":"rest-mi"}`
+	miReq, _ := http.NewRequest("POST", ts.URL+"/compute/v1/projects/"+project+"/global/machineImages", strings.NewReader(miBody))
+	miReq.Header.Set("Content-Type", "application/json")
+	miResp, err := http.DefaultClient.Do(miReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer miResp.Body.Close()
+	if miResp.StatusCode != 200 {
+		raw, _ := io.ReadAll(miResp.Body)
+		t.Fatalf("insert machine image status = %d body=%s", miResp.StatusCode, raw)
+	}
+	miGet, err := http.Get(ts.URL + "/compute/v1/projects/" + project + "/global/machineImages/rest-mi")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer miGet.Body.Close()
+	var mi map[string]any
+	if err := json.NewDecoder(miGet.Body).Decode(&mi); err != nil {
+		t.Fatal(err)
+	}
+	if mi["name"] != "rest-mi" || mi["kind"] != "compute#machineImage" {
+		t.Fatalf("unexpected machine image: %v", mi)
 	}
 }
