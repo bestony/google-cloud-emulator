@@ -17,6 +17,7 @@ import (
 
 	"github.com/bestony/google-cloud-emulator/core/iam"
 	"github.com/bestony/google-cloud-emulator/products/dns"
+	"github.com/bestony/google-cloud-emulator/products/pubsub"
 	"github.com/bestony/google-cloud-emulator/products/secretmanager"
 )
 
@@ -27,10 +28,14 @@ func main() {
 	iamStore := iam.NewStore()
 	smState := secretmanager.NewState(iamStore)
 	dnsState := dns.NewState(iamStore)
+	pubsubState := pubsub.NewState()
 
 	grpcServer := grpc.NewServer()
 	gateway := runtime.NewServeMux()
 	if err := secretmanager.Register(grpcServer, gateway, smState); err != nil {
+		fatal(err)
+	}
+	if err := pubsub.Register(grpcServer, gateway, pubsubState); err != nil {
 		fatal(err)
 	}
 
