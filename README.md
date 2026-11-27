@@ -2,9 +2,9 @@
 
 A local emulator for Google Cloud APIs, written in Go. Inspired by [aws/aws-emulator](https://github.com/aws/aws-emulator): API shapes are driven by the official [googleapis](https://github.com/googleapis/googleapis) protobuf models, and handwritten code only implements state and business rules.
 
-## Status: M2
+## Status: M3
 
-Control-plane CRUD for five hand-written products, plus **every other stable v1 Google Cloud API surface reachable** via auto-generated scaffolds. Pure in-memory state.
+Control-plane CRUD for eight hand-written products, plus **every other stable v1 Google Cloud API surface reachable** via auto-generated scaffolds. Pure in-memory state.
 
 | Product | Protocol | Coverage |
 |---|---|---|
@@ -13,12 +13,15 @@ Control-plane CRUD for five hand-written products, plus **every other stable v1 
 | Pub/Sub (`pubsub.googleapis.com`) | gRPC + REST (grpc-gateway) | Topics and subscriptions CRUD, list with pagination, `DetachSubscription`, server-assigned subscription names, `_deleted-topic_` semantics. Data plane (`Publish`/`Pull`/streaming) returns UNIMPLEMENTED. |
 | Cloud KMS (`cloudkms.googleapis.com`) | gRPC + REST (grpc-gateway) | Key rings CRUD, crypto keys CRUD, crypto key versions (create/list/get/update state/primary/destroy/restore). `DeleteCryptoKey`/`DeleteCryptoKeyVersion` return long-running operations via the shared `google.longrunning.Operations` service. Crypto data plane (`Encrypt`/`Decrypt`/`Asymmetric*`/`Mac*`/import jobs) returns UNIMPLEMENTED. |
 | Cloud Run v2 (`run.googleapis.com`) | gRPC + REST (grpc-gateway) | Services CRUD + revisions (template updates roll a new revision) + IAM policy verbs. Create/update/delete return LROs. Jobs/executions/instances/worker pools are not served. |
+| Compute Engine (`compute.googleapis.com`) | gRPC + REST (grpc-gateway) | Instances, disks, networks, subnetworks, firewalls, addresses, images, snapshots, instance templates, health checks CRUD; zonal/regional/global operations get/list; aggregated lists; machine types/zones/regions return honest empty reference data. ~114 other compute services stay UNIMPLEMENTED. |
+| Cloud SQL (`sqladmin.googleapis.com`) | gRPC + REST (grpc-gateway) | Instances CRUD (state RUNNABLE, ETag, self links), users/databases/backup runs subresources, operations get/list. Operations complete instantly as DONE. Flags/SSL certs/import-export stay UNIMPLEMENTED. |
+| GKE (`container.googleapis.com`) | gRPC + REST (grpc-gateway) | ClusterManager clusters CRUD + update (desired master version, monitoring, addons, …) + operations get/list. Node pools, server config, JSON web keys and IP rotation stay UNIMPLEMENTED. |
 
 Core framework: single h2c port serving gRPC and REST, host/path routing, accept-any Bearer auth, `google.rpc.Code` → REST error envelope, pagination tokens, IAM policy store.
 
 ### Bulk coverage (scaffold)
 
-`tools/vendor.py` pulls the dependency closure of every stable `v1` service proto from [googleapis/googleapis](https://github.com/googleapis/googleapis) into `protos/`, `tools/generate.py` regenerates `gen/` per directory, and `tools/scaffold.py` emits `products/scaffold/`: one registration per generated gRPC service (465 services across 146 packages) that embeds the generated `Unimplemented*Server`, so gRPC returns `UNIMPLEMENTED` and REST returns 501 with the standard error envelope. Hand-written products are excluded and registered first, so they win any route conflicts. Two protos (`google/api/httpbody.proto`, `google/rpc/status.proto`) intentionally use the genproto Go packages to avoid proto-registration conflicts with grpc-gateway's runtime.
+`tools/vendor.py` pulls the dependency closure of every stable `v1` service proto from [googleapis/googleapis](https://github.com/googleapis/googleapis) into `protos/`, `tools/generate.py` regenerates `gen/` per directory, and `tools/scaffold.py` emits `products/scaffold/`: one registration per generated gRPC service (442 services across 144 packages) that embeds the generated `Unimplemented*Server`, so gRPC returns `UNIMPLEMENTED` and REST returns 501 with the standard error envelope. The scaffold registers FIRST and the hand-written products after: grpc-gateway resolves duplicate REST patterns in favor of the last registration, so hand-written products win path conflicts. One known conflict: GKE and AlloyDB both use `/v1/projects/*/locations/*/clusters/*` (real GCP separates them by host); the emulator is single-host, so that path serves GKE. Two protos (`google/api/httpbody.proto`, `google/rpc/status.proto`) intentionally use the genproto Go packages to avoid proto-registration conflicts with grpc-gateway's runtime.
 
 ## Run
 
@@ -73,4 +76,5 @@ go build ./... && go test ./...
 
 - M1 (done): Pub/Sub, Cloud KMS, Cloud Run v2 control planes
 - M2 (done): bulk vendor + scaffold — all stable v1 control-plane surfaces reachable, UNIMPLEMENTED until hand-written
-- M3: data planes (GCS objects, Pub/Sub messages, Firestore, …) and more Tier-1 hand implementations (Compute, Cloud SQL, GKE, …)
+- M3 (done): Tier-1 hand-written control planes — Compute Engine, Cloud SQL, GKE
+- M4: data planes (GCS objects, Pub/Sub messages, Firestore, Datastore, …) and more Tier-1 hand implementations
