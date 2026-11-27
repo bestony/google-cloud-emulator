@@ -1,0 +1,1794 @@
+// Copyright 2026 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.agentregistry.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
+import "google/api/resource.proto";
+import "google/cloud/agentregistry/v1/agent.proto";
+import "google/cloud/agentregistry/v1/ai_application.proto";
+import "google/cloud/agentregistry/v1/binding.proto";
+import "google/cloud/agentregistry/v1/endpoint.proto";
+import "google/cloud/agentregistry/v1/finding.proto";
+import "google/cloud/agentregistry/v1/mcp_server.proto";
+import "google/cloud/agentregistry/v1/service.proto";
+import "google/cloud/agentregistry/v1/skill.proto";
+import "google/cloud/agentregistry/v1/skill_encryption_spec.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Google.Cloud.AgentRegistry.V1";
+option go_package = "github.com/bestony/google-cloud-emulator/gen/google/cloud/agentregistry/v1;agentregistrypb";
+option java_multiple_files = true;
+option java_outer_classname = "AgentRegistryServiceProto";
+option java_package = "com.google.cloud.agentregistry.v1";
+option php_namespace = "Google\\Cloud\\AgentRegistry\\V1";
+option ruby_package = "Google::Cloud::AgentRegistry::V1";
+
+// Service for managing Agent Registry resources.
+service AgentRegistry {
+  option (google.api.default_host) = "agentregistry.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/agentregistry.read-only,"
+      "https://www.googleapis.com/auth/agentregistry.read-write,"
+      "https://www.googleapis.com/auth/cloud-platform,"
+      "https://www.googleapis.com/auth/cloud-platform.read-only";
+
+  // Lists Agents in a given project and location.
+  rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/agents"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Searches Agents in a given project and location.
+  rpc SearchAgents(SearchAgentsRequest) returns (SearchAgentsResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*}/agents:search"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Agent.
+  rpc GetAgent(GetAgentRequest) returns (Agent) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/agents/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists Endpoints in a given project and location.
+  rpc ListEndpoints(ListEndpointsRequest) returns (ListEndpointsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/endpoints"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Endpoint.
+  rpc GetEndpoint(GetEndpointRequest) returns (Endpoint) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/endpoints/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists McpServers in a given project and location.
+  rpc ListMcpServers(ListMcpServersRequest) returns (ListMcpServersResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/mcpServers"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Searches McpServers in a given project and location.
+  rpc SearchMcpServers(SearchMcpServersRequest)
+      returns (SearchMcpServersResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*}/mcpServers:search"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single McpServer.
+  rpc GetMcpServer(GetMcpServerRequest) returns (McpServer) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/mcpServers/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists Services in a given project and location.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/services"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Service.
+  rpc GetService(GetServiceRequest) returns (Service) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/services/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Creates a new Service in a given project and location.
+  rpc CreateService(CreateServiceRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*}/services"
+      body: "service"
+    };
+    option (google.api.method_signature) = "parent,service,service_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "Service"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Updates the parameters of a single Service.
+  rpc UpdateService(UpdateServiceRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      patch: "/v1/{service.name=projects/*/locations/*/services/*}"
+      body: "service"
+    };
+    option (google.api.method_signature) = "service,update_mask";
+    option (google.longrunning.operation_info) = {
+      response_type: "Service"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Deletes a single Service.
+  rpc DeleteService(DeleteServiceRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      delete: "/v1/{name=projects/*/locations/*/services/*}"
+    };
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Lists Bindings in a given project and location.
+  rpc ListBindings(ListBindingsRequest) returns (ListBindingsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/bindings"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Binding.
+  rpc GetBinding(GetBindingRequest) returns (Binding) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/bindings/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Creates a new Binding in a given project and location.
+  rpc CreateBinding(CreateBindingRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*}/bindings"
+      body: "binding"
+    };
+    option (google.api.method_signature) = "parent,binding,binding_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "Binding"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Updates the parameters of a single Binding.
+  rpc UpdateBinding(UpdateBindingRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      patch: "/v1/{binding.name=projects/*/locations/*/bindings/*}"
+      body: "binding"
+    };
+    option (google.api.method_signature) = "binding,update_mask";
+    option (google.longrunning.operation_info) = {
+      response_type: "Binding"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Deletes a single Binding.
+  rpc DeleteBinding(DeleteBindingRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      delete: "/v1/{name=projects/*/locations/*/bindings/*}"
+    };
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Fetches available Bindings.
+  rpc FetchAvailableBindings(FetchAvailableBindingsRequest)
+      returns (FetchAvailableBindingsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/bindings:fetchAvailable"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // =========================================================================
+  // # Skills Collection APIs
+  //
+  // Creates a Skill resource container, optionally publishing the initial
+  // SkillRevision inline in a single, atomic CRUD roundtrip.
+  rpc CreateSkill(CreateSkillRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*}/skills"
+      body: "skill"
+    };
+    option (google.api.method_signature) = "parent,skill,skill_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "Skill"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Fetches the active configuration and metadata of a Skill.
+  rpc GetSkill(GetSkillRequest) returns (Skill) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/skills/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Updates Skill metadata or overrides active pointers/state using REST
+  // standard PATCH.
+  rpc UpdateSkill(UpdateSkillRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      patch: "/v1/{skill.name=projects/*/locations/*/skills/*}"
+      body: "skill"
+    };
+    option (google.api.method_signature) = "skill,update_mask";
+    option (google.longrunning.operation_info) = {
+      response_type: "Skill"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Deletes a Skill container along with all its revisions.
+  rpc DeleteSkill(DeleteSkillRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      delete: "/v1/{name=projects/*/locations/*/skills/*}"
+    };
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Lists logical Skills available in a project.
+  rpc ListSkills(ListSkillsRequest) returns (ListSkillsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/skills"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Custom deep-search method to filter by frontmatter or query SKILL.md text
+  // blobs.
+  rpc SearchSkills(SearchSkillsRequest) returns (SearchSkillsResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*}/skills:search"
+      body: "*"
+      additional_bindings {
+        get: "/v1/{parent=projects/*/locations/*}/skills:search"
+      }
+    };
+  }
+
+  // Creates a new immutable revision and triggers validation pipelines.
+  rpc CreateSkillRevision(CreateSkillRevisionRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*/skills/*}/revisions"
+      body: "skill_revision"
+    };
+    option (google.api.method_signature) =
+        "parent,skill_revision,skill_revision_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "SkillRevision"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Gets details of a single immutable Revision.
+  rpc GetSkillRevision(GetSkillRevisionRequest) returns (SkillRevision) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/skills/*/revisions/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Deletes a specific revision (restricted to admins to purge accidentally
+  // committed secrets).
+  rpc DeleteSkillRevision(DeleteSkillRevisionRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      delete: "/v1/{name=projects/*/locations/*/skills/*/revisions/*}"
+    };
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "OperationMetadata"
+    };
+  }
+
+  // Lists all revisions belonging to a parent Skill.
+  rpc ListSkillRevisions(ListSkillRevisionsRequest)
+      returns (ListSkillRevisionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*/skills/*}/revisions"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Fetches details of a specific Publisher.
+  rpc GetPublisher(GetPublisherRequest) returns (Publisher) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/publishers/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists all Publishers in a location.
+  rpc ListPublishers(ListPublishersRequest) returns (ListPublishersResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/publishers"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single AI Application.
+  rpc GetAiApplication(GetAiApplicationRequest) returns (AiApplication) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/aiApplications/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists AI Applications in a given project and location.
+  rpc ListAiApplications(ListAiApplicationsRequest)
+      returns (ListAiApplicationsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/aiApplications"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Agent under an AI Application.
+  rpc GetAiApplicationAgent(GetAiApplicationAgentRequest) returns (Agent) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/aiApplications/*/agents/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists Agents under an AI Application.
+  rpc ListAiApplicationAgents(ListAiApplicationAgentsRequest)
+      returns (ListAiApplicationAgentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*/aiApplications/*}/agents"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single McpServer under an AI Application.
+  rpc GetAiApplicationMcpServer(GetAiApplicationMcpServerRequest)
+      returns (McpServer) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/aiApplications/*/mcpServers/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists McpServers under an AI Application.
+  rpc ListAiApplicationMcpServers(ListAiApplicationMcpServersRequest)
+      returns (ListAiApplicationMcpServersResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*/aiApplications/*}/mcpServers"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Finding.
+  rpc GetFinding(GetFindingRequest) returns (Finding) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/findings/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists Findings in a given project and location.
+  rpc ListFindings(ListFindingsRequest) returns (ListFindingsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*}/findings"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets details of a single Endpoint under an AI Application.
+  rpc GetAiApplicationEndpoint(GetAiApplicationEndpointRequest)
+      returns (Endpoint) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/aiApplications/*/endpoints/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists Endpoints under an AI Application.
+  rpc ListAiApplicationEndpoints(ListAiApplicationEndpointsRequest)
+      returns (ListAiApplicationEndpointsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/locations/*/aiApplications/*}/endpoints"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // =========================================================================
+  // # Skill Encryption Spec Service Methods
+  //
+  // Gets the customer-managed encryption key (CMEK) configuration for Skills in
+  // a specific project and location.
+  rpc GetSkillEncryptionSpec(GetSkillEncryptionSpecRequest)
+      returns (SkillEncryptionSpec) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/locations/*/skillEncryptionSpec}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Updates the customer-managed encryption key (CMEK) configuration for Skills
+  // in a specific project and location.
+  //
+  // This method is only allowed when no Skills exist in the target project and
+  // location. If any Skill already exists in the location, the request fails
+  // with `FAILED_PRECONDITION`.
+  rpc UpdateSkillEncryptionSpec(UpdateSkillEncryptionSpecRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      patch: "/v1/{skill_encryption_spec.name=projects/*/locations/*/skillEncryptionSpec}"
+      body: "skill_encryption_spec"
+    };
+    option (google.api.method_signature) = "skill_encryption_spec,update_mask";
+    option (google.longrunning.operation_info) = {
+      response_type: "SkillEncryptionSpec"
+      metadata_type: "OperationMetadata"
+    };
+  }
+}
+
+// The type of search to perform. Additional search types may be supported in
+// the future.
+enum SearchType {
+  // Invalid search type.
+  SEARCH_TYPE_UNSPECIFIED = 0;
+
+  // Search for a keyword across all searchable fields.
+  KEYWORD = 1;
+
+  // Search based on the meaning and intent of a natural language query.
+  SEMANTIC = 2;
+}
+
+// Message for requesting list of Agents
+message ListAgentsRequest {
+  // Required. Parent value for ListAgentsRequest
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "locations.googleapis.com/Location"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Filtering results
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Hint for how to order the results
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Agents
+message ListAgentsResponse {
+  // The list of Agents.
+  repeated Agent agents = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for searching Agents
+message SearchAgentsRequest {
+  // Required. Parent value for SearchAgentsRequest. Format:
+  // `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "locations.googleapis.com/Location"
+    }
+  ];
+
+  // Optional. Search criteria used to select the Agents to return. If no search
+  // criteria is specified then all accessible Agents will be returned.
+  //
+  // Search expressions can be used to restrict results based upon searchable
+  // fields, where the operators can be used along with the suffix wildcard
+  // symbol `*`. See
+  // [instructions](https://docs.cloud.google.com/agent-registry/search-agents-and-tools)
+  // for more details.
+  //
+  // Allowed operators: `=`, `:`, `NOT`, `AND`, `OR`, and `()`.
+  //
+  // Searchable fields:
+  //
+  // | Field              | `=` | `:` | `*` | Keyword Search |
+  // |--------------------|-----|-----|-----|----------------|
+  // | agentId            | Yes | Yes | Yes | Included       |
+  // | name               | No  | Yes | Yes | Included       |
+  // | displayName        | No  | Yes | Yes | Included       |
+  // | description        | No  | Yes | No  | Included       |
+  // | skills             | No  | Yes | No  | Included       |
+  // | skills.id          | No  | Yes | No  | Included       |
+  // | skills.name        | No  | Yes | No  | Included       |
+  // | skills.description | No  | Yes | No  | Included       |
+  // | skills.tags        | No  | Yes | No  | Included       |
+  // | skills.examples    | No  | Yes | No  | Included       |
+  //
+  // Examples:
+  //
+  // * `agentId="urn:agent:projects-123:projects:123:locations:us-central1:aiplatform:reasoningEngines:1234"`
+  //   to find the agent with the specified agent ID.
+  // * `name:important` to find agents whose name contains `important` as a
+  //   word.
+  // * `displayName:works*` to find agents whose display name contains words
+  //   that start with `works`.
+  // * `skills.tags:test` to find agents whose skills tags contain `test`.
+  // * `planner OR booking` to find agents whose metadata contains the words
+  //   `planner` or `booking`.
+  string search_string = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The maximum number of search results to return per page. The page
+  // size is capped at `100`, even if a larger value is specified. A negative
+  // value will result in an `INVALID_ARGUMENT` error. If unspecified or set to
+  // `0`, a default value of `20` will be used. The server may return fewer
+  // results than requested.
+  int32 page_size = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. If present, retrieve the next batch of results from the preceding
+  // call to this method. `page_token` must be the value of `next_page_token`
+  // from the previous response. The values of all other method parameters, must
+  // be identical to those in the previous call.
+  string page_token = 7 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to searching Agents
+message SearchAgentsResponse {
+  // A list of Agents that match the `search_string`.
+  repeated Agent agents = 1;
+
+  // If there are more results than those appearing in this response, then
+  // `next_page_token` is included. To get the next set of results, call this
+  // method again using the value of `next_page_token` as `page_token`.
+  string next_page_token = 2;
+}
+
+// Message for getting a Agent
+message GetAgentRequest {
+  // Required. Name of the resource
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Agent"
+    }
+  ];
+}
+
+// Message for getting an Agent under an AI Application.
+message GetAiApplicationAgentRequest {
+  // Required. Name of the resource.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}/agents/{agent}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Agent"
+    }
+  ];
+}
+
+// Message for requesting list of Agents under an AI Application.
+message ListAiApplicationAgentsRequest {
+  // Required. Parent value (AI Application) for ListAiApplicationAgentsRequest.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/AiApplication"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Agents under an AI Application.
+message ListAiApplicationAgentsResponse {
+  // The list of Agents.
+  repeated Agent agents = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for requesting list of Endpoints
+message ListEndpointsRequest {
+  // Required. The project and location to list endpoints in.
+  // Expected format: `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "locations.googleapis.com/Location"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A query string used to filter the list of endpoints returned.
+  // The filter expression must follow AIP-160 syntax.
+  //
+  // Filtering is supported on the `name`, `display_name`, `description`,
+  // `version`, and `interfaces` fields.
+  //
+  // Some examples:
+  //
+  //   * `name = "projects/p1/locations/l1/endpoints/e1"`
+  //   * `display_name = "my-endpoint"`
+  //   * `description = "my-endpoint-description"`
+  //   * `version = "v1"`
+  //   * `interfaces.transport = "HTTP_JSON"`
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Endpoints
+message ListEndpointsResponse {
+  // The list of Endpoint resources matching the parent and filter criteria in
+  // the request. Each Endpoint resource follows the format:
+  // `projects/{project}/locations/{location}/endpoints/{endpoint}`.
+  repeated Endpoint endpoints = 1;
+
+  // A token identifying a page of results the server should return.
+  // Used in
+  // [page_token][google.cloud.agentregistry.v1main.ListEndpointsRequest.page_token].
+  string next_page_token = 2;
+}
+
+// Message for getting a Endpoint
+message GetEndpointRequest {
+  // Required. The name of the endpoint to retrieve.
+  // Format: `projects/{project}/locations/{location}/endpoints/{endpoint}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Endpoint"
+    }
+  ];
+}
+
+// Message for getting an Endpoint under an AI Application.
+message GetAiApplicationEndpointRequest {
+  // Required. Name of the resource.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}/endpoints/{endpoint}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Endpoint"
+    }
+  ];
+}
+
+// Message for requesting list of Endpoints under an AI Application.
+message ListAiApplicationEndpointsRequest {
+  // Required. Parent value (AI Application) for
+  // ListAiApplicationEndpointsRequest.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/AiApplication"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Endpoints under an AI Application.
+message ListAiApplicationEndpointsResponse {
+  // The list of Endpoints.
+  repeated Endpoint endpoints = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for requesting list of McpServers
+message ListMcpServersRequest {
+  // Required. Parent value for ListMcpServersRequest. Format:
+  // `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "locations.googleapis.com/Location"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Filtering results
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Hint for how to order the results
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing McpServers
+message ListMcpServersResponse {
+  // The list of McpServers.
+  repeated McpServer mcp_servers = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for searching MCP Servers
+message SearchMcpServersRequest {
+  // Required. Parent value for SearchMcpServersRequest. Format:
+  // `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "locations.googleapis.com/Location"
+    }
+  ];
+
+  // Optional. Search criteria used to select the MCP Servers to return. If no
+  // search criteria is specified then all accessible MCP Servers will be
+  // returned.
+  //
+  // Search expressions can be used to restrict results based upon searchable
+  // fields, where the operators can be used along with the suffix wildcard
+  // symbol `*`. See
+  // [instructions](https://docs.cloud.google.com/agent-registry/search-agents-and-tools)
+  // for more details.
+  //
+  // Allowed operators: `=`, `:`, `NOT`, `AND`, `OR`, and `()`.
+  //
+  // Searchable fields:
+  //
+  // | Field              | `=` | `:` | `*` | Keyword Search |
+  // |--------------------|-----|-----|-----|----------------|
+  // | mcpServerId        | Yes | Yes | Yes | Included       |
+  // | name               | No  | Yes | Yes | Included       |
+  // | displayName        | No  | Yes | Yes | Included       |
+  //
+  // Examples:
+  //
+  // * `mcpServerId="urn:mcp:projects-123:projects:123:locations:us-central1:agentregistry:services:service-id"`
+  //   to find the MCP Server with the specified MCP Server ID.
+  // * `name:important` to find MCP Servers whose name contains `important` as a
+  //   word.
+  // * `displayName:works*` to find MCP Servers whose display name contains
+  //   words that start with `works`.
+  // * `planner OR booking` to find MCP Servers whose metadata contains the
+  //   words `planner` or `booking`.
+  // * `mcpServerId:service-id AND (displayName:planner OR
+  //   displayName:booking)` to find MCP Servers whose MCP Server ID contains
+  //   `service-id` and whose display name contains `planner` or
+  //   `booking`.
+  string search_string = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The maximum number of search results to return per page. The page
+  // size is capped at `100`, even if a larger value is specified. A negative
+  // value will result in an `INVALID_ARGUMENT` error. If unspecified or set to
+  // `0`, a default value of `20` will be used. The server may return fewer
+  // results than requested.
+  int32 page_size = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. If present, retrieve the next batch of results from the preceding
+  // call to this method. `page_token` must be the value of `next_page_token`
+  // from the previous response. The values of all other method parameters, must
+  // be identical to those in the previous call.
+  string page_token = 7 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to searching MCP Servers
+message SearchMcpServersResponse {
+  // A list of McpServers that match the `search_string`.
+  repeated McpServer mcp_servers = 1;
+
+  // If there are more results than those appearing in this response, then
+  // `next_page_token` is included. To get the next set of results, call this
+  // method again using the value of `next_page_token` as `page_token`.
+  string next_page_token = 2;
+}
+
+// Message for getting a McpServer
+message GetMcpServerRequest {
+  // Required. Name of the resource
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/McpServer"
+    }
+  ];
+}
+
+// Message for getting an McpServer under an AI Application.
+message GetAiApplicationMcpServerRequest {
+  // Required. Name of the resource.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}/mcpServers/{mcp_server}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/McpServer"
+    }
+  ];
+}
+
+// Message for requesting list of McpServers under an AI Application.
+message ListAiApplicationMcpServersRequest {
+  // Required. Parent value (AI Application) for
+  // ListAiApplicationMcpServersRequest.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/AiApplication"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing McpServers under an AI Application.
+message ListAiApplicationMcpServersResponse {
+  // The list of McpServers.
+  repeated McpServer mcp_servers = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for requesting list of Services
+message ListServicesRequest {
+  // Required. The project and location to list services in.
+  // Expected format: `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Service"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A query string used to filter the list of services returned.
+  // The filter expression must follow AIP-160 syntax.
+  //
+  // Filtering is supported on the `name`, `display_name`, `description`,
+  // and `labels` fields.
+  //
+  // Some examples:
+  //
+  //   * `name = "projects/p1/locations/l1/services/s1"`
+  //   * `display_name = "my-service"`
+  //   * `description : "myservice description"`
+  //   * `labels.env = "prod"`
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Services
+message ListServicesResponse {
+  // The list of Service resources matching the parent and filter criteria in
+  // the request. Each Service resource follows the format:
+  // `projects/{project}/locations/{location}/services/{service}`.
+  repeated Service services = 1;
+
+  // A token identifying a page of results the server should return.
+  // Used in
+  // [page_token][google.cloud.agentregistry.v1main.ListServicesRequest.page_token].
+  string next_page_token = 2;
+}
+
+// Message for getting a Service
+message GetServiceRequest {
+  // Required. The name of the Service.
+  // Format: `projects/{project}/locations/{location}/services/{service}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Service"
+    }
+  ];
+}
+
+// Message for creating a Service
+message CreateServiceRequest {
+  // Required. The project and location to create the Service in.
+  // Expected format: `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Service"
+    }
+  ];
+
+  // Required. The ID to use for the service, which will become the final
+  // component of the service's resource name.
+  //
+  // This value should be 4-63 characters, and valid characters
+  // are `/[a-z][0-9]-/`.
+  string service_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The Service resource that is being created.
+  // Format: `projects/{project}/locations/{location}/services/{service}`.
+  Service service = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes since the first request.
+  //
+  // For example, consider a situation where you make an initial request and the
+  // request times out. If you make the request again with the same request
+  // ID, the server can check if original operation with the same request ID
+  // was received, and if so, will ignore the second request. This prevents
+  // clients from accidentally creating duplicate commitments.
+  //
+  // The request ID must be a valid UUID with the exception that zero UUID is
+  // not supported (00000000-0000-0000-0000-000000000000).
+  string request_id = 4 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Message for fetching available Bindings.
+message FetchAvailableBindingsRequest {
+  // Required. The reference of the source Agent Registry resource.
+  oneof source {
+    // The identifier of the source Agent.
+    // Format:
+    //
+    // * `urn:agent:{publisher}:{namespace}:{name}`
+    string source_identifier = 2;
+  }
+
+  // The reference of the target Agent Registry resource.
+  oneof target {
+    // Optional. The identifier of the target Agent, MCP Server, or Endpoint.
+    // Format:
+    //
+    // * `urn:agent:{publisher}:{namespace}:{name}`
+    // * `urn:mcp:{publisher}:{namespace}:{name}`
+    // * `urn:endpoint:{publisher}:{namespace}:{name}`
+    string target_identifier = 3 [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // Required. The parent, in the format
+  // `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Binding"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. Page size is 500 if unspecified and is capped at `500` even if a
+  // larger value is given.
+  int32 page_size = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to fetching available Bindings.
+message FetchAvailableBindingsResponse {
+  // The list of Bindings.
+  repeated Binding bindings = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for updating a Service
+message UpdateServiceRequest {
+  // Optional. Field mask is used to specify the fields to be overwritten in the
+  // Service resource by the update.
+  // The fields specified in the update_mask are relative to the resource, not
+  // the full request. A field will be overwritten if it is in the mask. If the
+  // user does not provide a mask then all fields present in the request will be
+  // overwritten.
+  google.protobuf.FieldMask update_mask = 1
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. The Service resource that is being updated.
+  // Format: `projects/{project}/locations/{location}/services/{service}`.
+  Service service = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes since the first request.
+  //
+  // For example, consider a situation where you make an initial request and the
+  // request times out. If you make the request again with the same request
+  // ID, the server can check if original operation with the same request ID
+  // was received, and if so, will ignore the second request. This prevents
+  // clients from accidentally creating duplicate commitments.
+  //
+  // The request ID must be a valid UUID with the exception that zero UUID is
+  // not supported (00000000-0000-0000-0000-000000000000).
+  string request_id = 3 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Message for deleting a Service
+message DeleteServiceRequest {
+  // Required. The name of the Service.
+  // Format: `projects/{project}/locations/{location}/services/{service}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Service"
+    }
+  ];
+
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes after the first request.
+  //
+  // For example, consider a situation where you make an initial request and the
+  // request times out. If you make the request again with the same request
+  // ID, the server can check if original operation with the same request ID
+  // was received, and if so, will ignore the second request. This prevents
+  // clients from accidentally creating duplicate commitments.
+  //
+  // The request ID must be a valid UUID with the exception that zero UUID is
+  // not supported (00000000-0000-0000-0000-000000000000).
+  string request_id = 2 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Represents the metadata of the long-running operation.
+message OperationMetadata {
+  // Output only. The time the operation was created.
+  google.protobuf.Timestamp create_time = 1
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The time the operation finished running.
+  google.protobuf.Timestamp end_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Server-defined resource path for the target of the operation.
+  string target = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Name of the verb executed by the operation.
+  string verb = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Human-readable status of the operation, if any.
+  string status_message = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Identifies whether the user has requested cancellation
+  // of the operation. Operations that have been cancelled successfully
+  // have
+  // [google.longrunning.Operation.error][google.longrunning.Operation.error]
+  // value with a [google.rpc.Status.code][google.rpc.Status.code] of `1`,
+  // corresponding to `Code.CANCELLED`.
+  bool requested_cancellation = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. API version used to start the operation.
+  string api_version = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Message for requesting a list of Bindings.
+message ListBindingsRequest {
+  // Required. The project and location to list bindings in.
+  // Expected format: `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Binding"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. Page size is 500 if unspecified and is capped at `500` even if a
+  // larger value is given.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A query string used to filter the list of bindings returned.
+  // The filter expression must follow AIP-160 syntax.
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Hint for how to order the results
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Bindings
+message ListBindingsResponse {
+  // The list of Binding resources matching the parent and filter criteria in
+  // the request. Each Binding resource follows the format:
+  // `projects/{project}/locations/{location}/bindings/{binding}`.
+  repeated Binding bindings = 1;
+
+  // A token identifying a page of results the server should return.
+  // Used in
+  // [page_token][google.cloud.agentregistry.v1main.ListBindingsRequest.page_token].
+  string next_page_token = 2;
+}
+
+// Message for getting a Binding
+message GetBindingRequest {
+  // Required. The name of the Binding.
+  // Format: `projects/{project}/locations/{location}/bindings/{binding}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Binding"
+    }
+  ];
+}
+
+// Message for creating a Binding
+message CreateBindingRequest {
+  // Required. The project and location to create the Binding in.
+  // Expected format: `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Binding"
+    }
+  ];
+
+  // Required. The ID to use for the binding, which will become the final
+  // component of the binding's resource name.
+  //
+  // This value should be 4-63 characters, and must conform to RFC-1034.
+  // Specifically, it must match the regular expression
+  // `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.
+  string binding_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The Binding resource that is being created.
+  Binding binding = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes since the first request.
+  //
+  // For example, consider a situation where you make an initial request and the
+  // request times out. If you make the request again with the same request
+  // ID, the server can check if original operation with the same request ID
+  // was received, and if so, will ignore the second request. This prevents
+  // clients from accidentally creating duplicate commitments.
+  //
+  // The request ID must be a valid UUID with the exception that zero UUID is
+  // not supported (00000000-0000-0000-0000-000000000000).
+  string request_id = 4 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Message for updating a Binding
+message UpdateBindingRequest {
+  // Required. The Binding resource that is being updated.
+  Binding binding = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Field mask is used to specify the fields to be overwritten in the
+  // Binding resource by the update.
+  // The fields specified in the update_mask are relative to the resource, not
+  // the full request. A field will be overwritten if it is in the mask. If the
+  // user does not provide a mask then all fields present in the request will be
+  // overwritten.
+  google.protobuf.FieldMask update_mask = 2
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes since the first request.
+  //
+  // For example, consider a situation where you make an initial request and the
+  // request times out. If you make the request again with the same request
+  // ID, the server can check if original operation with the same request ID
+  // was received, and if so, will ignore the second request. This prevents
+  // clients from accidentally creating duplicate commitments.
+  //
+  // The request ID must be a valid UUID with the exception that zero UUID is
+  // not supported (00000000-0000-0000-0000-000000000000).
+  string request_id = 3 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Message for deleting a Binding
+message DeleteBindingRequest {
+  // Required. The name of the Binding.
+  // Format: `projects/{project}/locations/{location}/bindings/{binding}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Binding"
+    }
+  ];
+
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes after the first request.
+  //
+  // For example, consider a situation where you make an initial request and the
+  // request times out. If you make the request again with the same request
+  // ID, the server can check if original operation with the same request ID
+  // was received, and if so, will ignore the second request. This prevents
+  // clients from accidentally creating duplicate commitments.
+  //
+  // The request ID must be a valid UUID with the exception that zero UUID is
+  // not supported (00000000-0000-0000-0000-000000000000).
+  string request_id = 2 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// =========================================================================
+// # Skills Messages
+//
+// Message requesting creation of a logical Skill container.
+message CreateSkillRequest {
+  // Required. The project and location location to bootstrap.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+
+  // Required. Custom, user-defined unique container identifier.
+  // Must be unique within the parent project and location.
+  // This value should be 4-64 characters, and valid characters
+  // are `/[a-z][0-9]-/`.
+  string skill_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Skill container body config.
+  Skill skill = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Signed UUID request idempotency token.
+  string request_id = 4 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Message requesting details of a Skill.
+message GetSkillRequest {
+  // Required. Target resource container name.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+}
+
+// Message requesting a metadata update of a Skill.
+message UpdateSkillRequest {
+  // Required. Mutable Skill container config fields to write.
+  Skill skill = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Standard update target mask mapping relative fields.
+  google.protobuf.FieldMask update_mask = 2
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Signed UUID request idempotency token.
+  string request_id = 3 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Message requesting deletion of a Skill.
+message DeleteSkillRequest {
+  // Required. Target Skill container name to remove.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+
+  // Optional. Signed UUID request idempotency token.
+  string request_id = 2 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // Optional. If set to true, any child SkillRevisions under this Skill will
+  // also be deleted. Otherwise, the request will only succeed if the Skill has
+  // no child SkillRevisions.
+  bool force = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Requesting a list of Skills inside a location.
+message ListSkillsRequest {
+  // Required. Parent value for ListSkillsRequest
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Use this field to specify filter criteria on list results.
+  // Filter expressions can be used to restrict results based upon filterable
+  // fields, where equality operators can be used. See
+  // [instructions](https://docs.cloud.google.com/agent-registry/search-agents-and-tools)
+  // for more details.
+  //
+  // Allowed operators: `=`, `<`, `>`, `NOT`, `AND`, `OR`, and `()`.
+  //
+  // | Field        | `=` | `<`, `>` |
+  // |--------------|-----|----------|
+  // | state        | Yes | No       |
+  // | targetState  | Yes | No       |
+  // | createTime   | Yes | Yes      |
+  // | updateTime   | Yes | Yes      |
+  //
+  // Examples:
+  //
+  // * `state=ACTIVE` to restrict results to skills in the `ACTIVE` state.
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Hint for how to order the results
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response structure listing logical Skills.
+message ListSkillsResponse {
+  // Returned container list.
+  repeated Skill skills = 1;
+
+  // Page continuation continuation token.
+  string next_page_token = 2;
+
+  // Unreachable locations or failures.
+  repeated string unreachable = 3;
+}
+
+// Requesting a deep search of Skills.
+message SearchSkillsRequest {
+  // Required. Parent value for SearchSkillsRequest. Format:
+  // `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+
+  // Optional. The type of search.
+  SearchType search_type = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Search criteria used to select the Skills to return. If no search
+  // criteria is specified then all accessible Skills will be returned.
+  //
+  // Search expressions can be used to restrict results based upon searchable
+  // fields, where the operators can be used along with the suffix wildcard
+  // symbol `*`. See
+  // [instructions](https://docs.cloud.google.com/agent-registry/search-agents-and-tools)
+  // for more details.
+  //
+  // Allowed operators: `=`, `:`, `NOT`, `AND`, `OR`, and `()`.
+  //
+  // Searchable fields:
+  //
+  // | Field                     | `=` | `:` | `*` | Keyword Search |
+  // |---------------------------|-----|-----|-----|----------------|
+  // | skillId                   | Yes | Yes | Yes | Included       |
+  // | name                      | No  | Yes | Yes | Included       |
+  // | displayName               | No  | Yes | Yes | Included       |
+  // | description               | No  | Yes | No  | Included       |
+  // | frontmatter.name          | No  | Yes | No  | Included       |
+  // | frontmatter.description   | No  | Yes | No  | Included       |
+  // | frontmatter.compatibility | No  | Yes | No  | Included       |
+  // | frontmatter.license       | No  | Yes | No  | Included       |
+  //
+  // Examples:
+  //
+  // * `skillId="urn:skill:projects-1234:locations:global:private-important-skill"`
+  //   to find the skill with the specified skill ID.
+  // * `name:important` to find skills whose name contains `important` as a
+  //   word.
+  // * `displayName:works*` to find skills whose display name contains words
+  //   that start with `works`.
+  string search_string = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Use this field to specify additional filter criteria on search
+  // results. Filter expressions can be used to restrict results based upon
+  // filterable fields, where equality operators can be used. See
+  // [instructions](https://docs.cloud.google.com/agent-registry/search-agents-and-tools)
+  // for more details.
+  //
+  // Allowed operators: `=`, `<`, `>`, `NOT`, `AND`, `OR`, and `()`.
+  //
+  // | Field        | `=` | `<`, `>` |
+  // |--------------|-----|----------|
+  // | state        | Yes | No       |
+  // | targetState  | Yes | No       |
+  // | createTime   | Yes | Yes      |
+  // | updateTime   | Yes | Yes      |
+  //
+  // Examples:
+  //
+  // * `state=ACTIVE` to restrict results to skills in the `ACTIVE` state.
+  string filter = 5 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The maximum number of search results to return per page. The page
+  // size is capped at `100`, even if a larger value is specified. A negative
+  // value will result in an `INVALID_ARGUMENT` error. If unspecified or set to
+  // `0`, a default value of `20` will be used. The server may return fewer
+  // results than requested.
+  int32 page_size = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. If present, retrieve the next batch of results from the preceding
+  // call to this method. `page_token` must be the value of `next_page_token`
+  // from the previous response. The values of all other method parameters, must
+  // be identical to those in the previous call.
+  string page_token = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response listing searched Skills.
+message SearchSkillsResponse {
+  // Matched Skills list.
+  repeated Skill skills = 1;
+
+  // Query page offset continuation token.
+  string next_page_token = 2;
+}
+
+// Requesting creation of a new SkillRevision snapshot.
+message CreateSkillRevisionRequest {
+  // Required. Parent logical container name.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+
+  // Required. Immutable SkillRevision snapshot definition schema.
+  SkillRevision skill_revision = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Custom, user-defined unique revision identifier.
+  // Format: 4-63 characters, matching regex `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`
+  string skill_revision_id = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Signed UUID request idempotency token.
+  string request_id = 4 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Requesting details of a Revision.
+message GetSkillRevisionRequest {
+  // Required. Target revision name.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/SkillRevision"
+    }
+  ];
+}
+
+// Requesting deletion of a specific Revision.
+message DeleteSkillRevisionRequest {
+  // Required. Target revision name to remove.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/SkillRevision"
+    }
+  ];
+
+  // Optional. Signed UUID request idempotency token.
+  string request_id = 2 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// Requesting a list of Revisions under a Skill.
+message ListSkillRevisionsRequest {
+  // Required. Parent logical container name to query.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Skill"
+    }
+  ];
+
+  // Optional. Page limit size.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Page offset token.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response listing Revisions.
+message ListSkillRevisionsResponse {
+  // Returned version snapshot list.
+  repeated SkillRevision skill_revisions = 1;
+
+  // Page offset continuation token.
+  string next_page_token = 2;
+}
+
+// Requesting details of a specific Publisher.
+message GetPublisherRequest {
+  // Required. Target publisher resource name.
+  // Format: `projects/{project}/locations/{location}/publishers/{publisher}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Publisher"
+    }
+  ];
+}
+
+// Requesting a list of Publishers.
+message ListPublishersRequest {
+  // Required. Parent location to query.
+  // Format: `projects/{project}/locations/{location}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Publisher"
+    }
+  ];
+
+  // Optional. Page limit size.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Page offset token.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response listing Publishers.
+message ListPublishersResponse {
+  // The returned list of Publishers.
+  repeated Publisher publishers = 1;
+
+  // Page offset continuation token.
+  string next_page_token = 2;
+}
+
+// Message for getting an AI Application.
+message GetAiApplicationRequest {
+  // Required. Target AI Application resource name.
+  // Format:
+  // `projects/{project}/locations/{location}/aiApplications/{ai_application}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/AiApplication"
+    }
+  ];
+}
+
+// Message for requesting a list of AiApplications.
+message ListAiApplicationsRequest {
+  // Required. Parent project and location to query.
+  // Format: `projects/{project}/locations/{location}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/AiApplication"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Filtering results.
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Hint for how to order the results.
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing AiApplications.
+message ListAiApplicationsResponse {
+  // The list of AiApplications.
+  repeated AiApplication ai_applications = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+
+  // Unordered list. Locations that could not be reached.
+  repeated string unreachable = 3
+      [(google.api.field_behavior) = UNORDERED_LIST];
+}
+
+// Message for requesting list of Findings.
+message ListFindingsRequest {
+  // Required. Parent value for ListFindingsRequest. Format:
+  // `projects/{project}/locations/{location}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "agentregistry.googleapis.com/Finding"
+    }
+  ];
+
+  // Optional. Requested page size. Server may return fewer items than
+  // requested. If unspecified, server will pick an appropriate default.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A token identifying a page of results the server should return.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Filtering results
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Hint for how to order the results
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Message for response to listing Findings.
+message ListFindingsResponse {
+  // The list of Findings.
+  repeated Finding findings = 1;
+
+  // A token identifying a page of results the server should return.
+  string next_page_token = 2;
+}
+
+// Message for getting a Finding.
+message GetFindingRequest {
+  // Required. The name of the Finding to retrieve.
+  // Format: `projects/{project}/locations/{location}/findings/{finding}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/Finding"
+    }
+  ];
+}
+
+// Message for requesting a SkillEncryptionSpec.
+message GetSkillEncryptionSpecRequest {
+  // Required. The name of the SkillEncryptionSpec to retrieve.
+  // Format: `projects/{project}/locations/{location}/skillEncryptionSpec`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "agentregistry.googleapis.com/SkillEncryptionSpec"
+    }
+  ];
+}
+
+// Message for updating a SkillEncryptionSpec.
+message UpdateSkillEncryptionSpecRequest {
+  // Required. The SkillEncryptionSpec to update.
+  SkillEncryptionSpec skill_encryption_spec = 1
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Field mask is used to specify the fields to be overwritten in the
+  // SkillEncryptionSpec resource by the update.
+  // The fields specified in the update_mask are relative to the resource, not
+  // the full request. A field will be overwritten if it is in the mask. If the
+  // user does not provide a mask then all fields present in the request will be
+  // overwritten.
+  google.protobuf.FieldMask update_mask = 2
+      [(google.api.field_behavior) = OPTIONAL];
+}

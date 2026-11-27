@@ -23,6 +23,7 @@ import (
 	"github.com/bestony/google-cloud-emulator/products/kms"
 	"github.com/bestony/google-cloud-emulator/products/pubsub"
 	"github.com/bestony/google-cloud-emulator/products/run"
+	"github.com/bestony/google-cloud-emulator/products/scaffold"
 	"github.com/bestony/google-cloud-emulator/products/secretmanager"
 )
 
@@ -57,6 +58,11 @@ func main() {
 	longrunningpb.RegisterOperationsServer(grpcServer, opsServer)
 	if err := longrunningpb.RegisterOperationsHandlerServer(context.Background(), gateway, opsServer); err != nil {
 		fatal(err)
+	}
+	// Every other generated service: reachable, honestly UNIMPLEMENTED.
+	// Registered last so hand-written products win any route conflicts.
+	if err := scaffold.RegisterAll(grpcServer, gateway); err != nil {
+		fmt.Fprintf(os.Stderr, "gcpex: scaffold gateway conflicts: %v\n", err)
 	}
 
 	mux := http.NewServeMux()

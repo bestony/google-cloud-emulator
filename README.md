@@ -2,9 +2,9 @@
 
 A local emulator for Google Cloud APIs, written in Go. Inspired by [aws/aws-emulator](https://github.com/aws/aws-emulator): API shapes are driven by the official [googleapis](https://github.com/googleapis/googleapis) protobuf models, and handwritten code only implements state and business rules.
 
-## Status: M1
+## Status: M2
 
-Control-plane CRUD for five products, pure in-memory state:
+Control-plane CRUD for five hand-written products, plus **every other stable v1 Google Cloud API surface reachable** via auto-generated scaffolds. Pure in-memory state.
 
 | Product | Protocol | Coverage |
 |---|---|---|
@@ -15,6 +15,10 @@ Control-plane CRUD for five products, pure in-memory state:
 | Cloud Run v2 (`run.googleapis.com`) | gRPC + REST (grpc-gateway) | Services CRUD + revisions (template updates roll a new revision) + IAM policy verbs. Create/update/delete return LROs. Jobs/executions/instances/worker pools are not served. |
 
 Core framework: single h2c port serving gRPC and REST, host/path routing, accept-any Bearer auth, `google.rpc.Code` → REST error envelope, pagination tokens, IAM policy store.
+
+### Bulk coverage (scaffold)
+
+`tools/vendor.py` pulls the dependency closure of every stable `v1` service proto from [googleapis/googleapis](https://github.com/googleapis/googleapis) into `protos/`, `tools/generate.py` regenerates `gen/` per directory, and `tools/scaffold.py` emits `products/scaffold/`: one registration per generated gRPC service (465 services across 146 packages) that embeds the generated `Unimplemented*Server`, so gRPC returns `UNIMPLEMENTED` and REST returns 501 with the standard error envelope. Hand-written products are excluded and registered first, so they win any route conflicts. Two protos (`google/api/httpbody.proto`, `google/rpc/status.proto`) intentionally use the genproto Go packages to avoid proto-registration conflicts with grpc-gateway's runtime.
 
 ## Run
 
@@ -54,14 +58,19 @@ products/<name>/   one package per emulated product: state + handlers + registra
 
 ## Regenerating code
 
-Requires `buf` and the local protoc plugins (`protoc-gen-go`, `protoc-gen-go-grpc`, `protoc-gen-grpc-gateway`):
+Requires `buf`, the local protoc plugins (`protoc-gen-go`, `protoc-gen-go-grpc`, `protoc-gen-grpc-gateway`), and a clone of googleapis at `~/googleapis` (`GOOGLEAPIS` env var overrides):
 
 ```bash
-buf generate   # reads buf.yaml/buf.gen.yaml, writes gen/
+go mod download
+python3 tools/vendor.py --scan   # list stable v1 service protos not yet vendored
+python3 tools/vendor.py <proto>… # vendor specific products (dependency closure)
+python3 tools/generate.py --jobs 8   # regenerate gen/ (per-directory, gateway fallback)
+python3 tools/scaffold.py            # regenerate products/scaffold registrations
+go build ./... && go test ./...
 ```
 
 ## Roadmap
 
 - M1 (done): Pub/Sub, Cloud KMS, Cloud Run v2 control planes
-- M2: `gen-scaffold` to auto-generate UNIMPLEMENTED stubs for the long tail of Google Cloud APIs
-- M3: data planes (GCS objects, Pub/Sub messages, Firestore, …)
+- M2 (done): bulk vendor + scaffold — all stable v1 control-plane surfaces reachable, UNIMPLEMENTED until hand-written
+- M3: data planes (GCS objects, Pub/Sub messages, Firestore, …) and more Tier-1 hand implementations (Compute, Cloud SQL, GKE, …)
